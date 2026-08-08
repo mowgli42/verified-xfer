@@ -63,3 +63,55 @@ def test_dry_run_writes_nothing():
         rc = stage(cfg, status, dry_run=True)
         assert rc == 0
         assert list((tmp / "staging").iterdir()) == []
+
+
+def test_retrieve_dry_run_writes_nothing():
+    log = setup_logging(verbose=False)
+    status = Status(log)
+
+    with tempfile.TemporaryDirectory() as td:
+        tmp = Path(td)
+        cfg = _cfg(tmp)
+        (tmp / "results" / "output.bin").write_bytes(b"result-data")
+        rc = retrieve(cfg, status, dry_run=True)
+        assert rc == 0
+        assert not (tmp / "retrieved").exists() or list((tmp / "retrieved").iterdir()) == []
+
+
+def test_empty_source_dir():
+    log = setup_logging(verbose=False)
+    status = Status(log)
+
+    with tempfile.TemporaryDirectory() as td:
+        tmp = Path(td)
+        cfg = _cfg(tmp)
+        for p in (tmp / "source").iterdir():
+            p.unlink()
+        rc = stage(cfg, status, dry_run=False)
+        assert rc == 0
+        assert list((tmp / "staging").iterdir()) == []
+
+
+def test_empty_results_dir():
+    log = setup_logging(verbose=False)
+    status = Status(log)
+
+    with tempfile.TemporaryDirectory() as td:
+        tmp = Path(td)
+        cfg = _cfg(tmp)
+        rc = retrieve(cfg, status, dry_run=False)
+        assert rc == 0
+        assert not (tmp / "retrieved").exists() or list((tmp / "retrieved").iterdir()) == []
+
+
+def test_stage_refuses_overwrite_without_force():
+    log = setup_logging(verbose=False)
+    status = Status(log)
+
+    with tempfile.TemporaryDirectory() as td:
+        tmp = Path(td)
+        cfg = _cfg(tmp)
+        assert stage(cfg, status, dry_run=False, force=False) == 0
+        rc = stage(cfg, status, dry_run=False, force=False)
+        assert rc == 1
+        assert len(list((tmp / "staging").iterdir())) == 2

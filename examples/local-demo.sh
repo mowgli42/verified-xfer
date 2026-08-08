@@ -18,18 +18,20 @@ results_dir: $DEMO/results
 retrieve_to: $DEMO/retrieved
 EOF
 
+PYTHON=${PYTHON:-python3}
+
 echo "=== STAGE (dry-run) ==="
-python -m verified_xfer stage -c "$DEMO/config.yaml" --dry-run
+$PYTHON -m verified_xfer stage -c "$DEMO/config.yaml" --dry-run
 
 echo "=== STAGE ==="
-python -m verified_xfer stage -c "$DEMO/config.yaml"
+$PYTHON -m verified_xfer stage -c "$DEMO/config.yaml"
 
 echo "=== Simulate test producing results ==="
 echo "PASS" > "$DEMO/results/test.log"
 echo "42" > "$DEMO/results/answer.txt"
 
 echo "=== RETRIEVE ==="
-python -m verified_xfer retrieve -c "$DEMO/config.yaml"
+$PYTHON -m verified_xfer retrieve -c "$DEMO/config.yaml"
 
 echo "=== Retrieved contents ==="
 ls -l "$DEMO/retrieved"
