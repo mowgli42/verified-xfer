@@ -1,10 +1,10 @@
 """IxDF / Nielsen visibility-of-system-status logging helpers.
 
-Every important step must answer:
+Operators are often not software engineers. Every important step must answer:
   - what is happening / about to happen
   - what just succeeded or failed
-  - concrete paths, sizes, short hashes
-  - next safe action on error
+  - concrete paths, sizes, short hashes (file fingerprints)
+  - next safe action on error (plain language after →)
 """
 
 from __future__ import annotations
@@ -42,7 +42,12 @@ class Status:
         self.log.info("PRE-FLIGHT | %s%s", msg, f"  {extra}" if extra else "")
 
     def file_info(self, name: str, size: int, sha: str) -> None:
-        self.log.info("FILE       | %s  size=%d  sha256=%s", name, size, short_hash(sha))
+        self.log.info(
+            "FILE       | %s  size=%d  checksum=%s",
+            name,
+            size,
+            short_hash(sha),
+        )
 
     def transfer(self, direction: str, path: str) -> None:
         self.log.info("TRANSFER   | %s %s", direction, path)
@@ -57,9 +62,21 @@ class Status:
     def fail(self, msg: str, hint: str = "") -> None:
         self.log.error("FAIL       | %s%s", msg, f"  → {hint}" if hint else "")
 
+    def next_step(self, msg: str) -> None:
+        """Plain-language guidance for non-technical operators."""
+        self.log.info("NEXT       | %s", msg)
+
     def summary(self, ok: int, total: int, action: str) -> None:
         status = "OK" if ok == total else "PARTIAL"
         self.log.info("SUMMARY    | %s  %d/%d files %s", status, ok, total, action)
+        if ok == total and total > 0:
+            self.next_step(f"All {total} file(s) {action}. Safe to continue.")
+        elif total == 0:
+            self.next_step("No files found. Check the folder path in your config.")
+        else:
+            self.next_step(
+                f"{total - ok} file(s) need attention. Scroll up for FAIL lines and the → hints."
+            )
 
     def info(self, msg: str) -> None:
         self.log.info("%s", msg)

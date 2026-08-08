@@ -65,11 +65,19 @@ Dependencies are expressed so `bd ready` yields a safe sequence.
 - Update this tasks.md with completion notes.
 - **Depends on**: 10
 
+### 12. Operator feedback (non-technical IxDF)
+- `DESIGN.md` voice rules + `.cursor/rules/ixdf-operator-feedback.mdc`.
+- Plain-language FAIL / NEXT lines for lab operators.
+- **Depends on**: 3
+
 ---
 
-**Recommended Beads creation order** (after `bd init`):
+## Completion notes (2026-08-08)
 
-```bash
-bd create --type epic --title "verified-xfer-initial" --tag openspec
-# then create each numbered task with --epic and --depends-on as needed
-```
+| # | Status | Evidence |
+|---|--------|----------|
+| 1–10 | Done | Package, config discovery, IxDF logger, backends, stage/retrieve, CLI, `tests/test_local_stage_retrieve.py`, `examples/local-demo.sh` |
+| 11 | Done (this pass) | `openspec/specs/file-staging/spec.md`, README health UX order, design.md, BEADS.md |
+| 12 | Done (this pass) | `DESIGN.md`, `ixdf-operator-feedback.mdc`, NEXT lines + softened FAIL copy |
+
+Beads epic: `vx-0t0` (`bd ready` / `BEADS.md`).

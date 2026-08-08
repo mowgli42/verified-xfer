@@ -1,7 +1,9 @@
 # Troubleshooting Guide – verified-xfer
 
-Every failure mode is designed to produce a clear `FAIL | … → recovery hint` line.  
-Use this document when the log is not enough or you need the deeper “why”.
+When something goes wrong, the tool prints a `FAIL | … → …` line.  
+The text after `→` is the next thing to try. Use this guide when you need more detail.
+
+Written for lab operators: start with the symptom you see on screen, then follow the Fix.
 
 ---
 
