@@ -1,0 +1,12 @@
+schema: behaviour-driven
+project: verified-xfer
+description: >
+  Verified staging of files from Windows local storage to a Linux shared
+  folder (SFTP or mounted NFS) plus retrieval of test results and logs
+  from a separate remote directory. Heavy verification and IxDF-style
+  status feedback.
+stack: python
+context: |
+  Ponytail minimalism applies: YAGNI, stdlib first, one clear path.
+  Use Beads (bd) for task tracking after OpenSpec tasks.md is ready.
+  Logging must make system status continuously visible (IxDF / Nielsen #1).
