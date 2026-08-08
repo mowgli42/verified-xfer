@@ -1,8 +1,17 @@
 # verified-xfer
 
-Copy test files to a Linux share, then pull results back — with a check on every file.
+Upload test files from a **local folder** to a **Linux folder**, then pull **logs/results** from a **different Linux folder** back to a local folder — with a check on every file.
 
-Built for lab operators: each step prints plain status (`PRE-FLIGHT` → `TRANSFER` → `VERIFY` → `SUCCESS` / `FAIL` → `SUMMARY` → `NEXT`) so you always know what happened and what to do next. No GUI, no daemon — one small Python CLI.
+The config names four folders:
+
+| Key | Role |
+|-----|------|
+| `source_dir` | Local folder to upload from |
+| `staging_dir` | Linux folder that receives the upload |
+| `results_dir` | Linux folder for log/result data (must differ from `staging_dir`) |
+| `retrieve_to` | Local folder where retrieved logs/results are saved |
+
+Built for lab operators: each step prints plain status (`INITIALIZATION` → `TRANSFER` → `VERIFY` → `SUCCESS` / `FAIL` → `SUMMARY` → `NEXT`) so you always know what happened and what to do next. No GUI, no daemon — one small Python CLI.
 
 ## CLI session capture
 
@@ -10,7 +19,7 @@ From `examples/local-demo.sh` (full log: [docs/images/cli-demo.txt](docs/images/
 
 ```text
 === STAGE ===
-PRE-FLIGHT | 2 file(s) to stage
+INITIALIZATION | 2 file(s) to upload
 FILE       | meta.txt  size=8  checksum=1afd1b403a9a…
 TRANSFER   | → …/staging/meta.txt
 VERIFY     | OK   size=8 checksum=1afd1b403a9a…
@@ -28,13 +37,13 @@ NEXT       | All 2 file(s) retrieved. Safe to continue.
 ```mermaid
 flowchart LR
   subgraph Windows_or_Linux["Operator machine"]
-    SRC[source_dir<br/>test inputs]
-    RET[retrieve_to<br/>results home]
+    SRC[source_dir<br/>local upload]
+    RET[retrieve_to<br/>local retrieve]
     CLI[verified-xfer CLI]
   end
   subgraph Share["Linux share / SFTP host"]
-    STG[staging_dir]
-    RES[results_dir]
+    STG[staging_dir<br/>linux upload]
+    RES[results_dir<br/>linux logs]
   end
   SRC -->|stage + verify| CLI
   CLI -->|copy + checksum| STG
@@ -60,7 +69,7 @@ sequenceDiagram
   CLI-->>Op: SUCCESS / FAIL + NEXT
   Note over Op: External test runs (out of scope)
   Op->>CLI: retrieve
-  CLI->>Share: List results_dir
+  CLI->>Share: List results_dir (logs, separate from staging)
   CLI->>Op: Copy into retrieve_to + verify
   CLI-->>Op: SUMMARY + NEXT
 ```

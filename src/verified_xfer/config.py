@@ -97,6 +97,16 @@ def redact_for_log(cfg: dict[str, Any]) -> dict[str, Any]:
     return safe
 
 
+REQUIRED_FOLDERS = ("source_dir", "staging_dir", "results_dir", "retrieve_to")
+
+FOLDER_ROLES = {
+    "source_dir": "1 local upload source",
+    "staging_dir": "2 linux upload destination",
+    "results_dir": "3 linux logs/results (separate from upload)",
+    "retrieve_to": "4 local retrieve destination",
+}
+
+
 def format_config_summary(cfg: dict[str, Any], path: Path, label: str) -> list[str]:
     """Human-readable lines describing the effective config for the log."""
     safe = redact_for_log(cfg)
@@ -104,14 +114,30 @@ def format_config_summary(cfg: dict[str, Any], path: Path, label: str) -> list[s
         f"source={label}",
         f"path={path}",
         f"backend={safe.get('backend', 'local')}",
-        f"source_dir={safe.get('source_dir', '—')}",
-        f"staging_dir={safe.get('staging_dir', '—')}",
-        f"results_dir={safe.get('results_dir', '—')}",
-        f"retrieve_to={safe.get('retrieve_to', '—')}",
+        "folders (upload: source_dir→staging_dir; retrieve: results_dir→retrieve_to)",
     ]
+    for key in REQUIRED_FOLDERS:
+        role = FOLDER_ROLES[key]
+        lines.append(f"{key}={safe.get(key, '—')}  ({role})")
     if safe.get("backend") == "sftp" and isinstance(safe.get("sftp"), dict):
         s = safe["sftp"]
         lines.append(f"sftp.host={s.get('host', '—')}")
         lines.append(f"sftp.user={s.get('username', '—')}")
         lines.append(f"sftp.key={s.get('key_filename', '—')}")
     return lines
+
+
+def validate_folders(cfg: dict[str, Any]) -> str | None:
+    """Return an error message if the four folders are missing or not distinct."""
+    missing = [k for k in REQUIRED_FOLDERS if k not in cfg or not str(cfg.get(k, "")).strip()]
+    if missing:
+        return f"config missing folders: {missing}"
+
+    staging = str(cfg["staging_dir"]).rstrip("/\\")
+    results = str(cfg["results_dir"]).rstrip("/\\")
+    if staging == results:
+        return (
+            "staging_dir and results_dir must be different folders "
+            "(upload destination is separate from log/result data)"
+        )
+    return None

@@ -34,7 +34,8 @@ config.yaml  →  CLI (stage | retrieve)  →  Backend (local | sftp)
 
 | IxDF / Nielsen idea | How we apply it |
 |---------------------|-----------------|
-| Visibility of system status | PRE-FLIGHT / TRANSFER / VERIFY / SUMMARY always printed |
+| Visibility of system status | INITIALIZATION / TRANSFER / VERIFY / SUMMARY always printed |
+| Four folders | local source → linux staging; linux results/logs → local retrieve (staging ≠ results) |
 | Match the real world | Talk about folders and files, not “payloads” or “artifacts” |
 | Error prevention | Overwrite protection unless `--force`; dry-run available |
 | Help users recover | Every FAIL includes a next safe action |

@@ -81,8 +81,16 @@ Every important step SHALL announce status so a non-technical operator never has
 
 - **GIVEN** a stage or retrieve run
 - **WHEN** work progresses
-- **THEN** stdout shows tagged lines: `PRE-FLIGHT`, `CONFIG`, `FILE`, `TRANSFER`, `VERIFY`, `SUCCESS`/`FAIL`, `SUMMARY`
+- **THEN** stdout shows tagged lines: `INITIALIZATION`, `CONFIG`, `FILE`, `TRANSFER`, `VERIFY`, `SUCCESS`/`FAIL`, `SUMMARY`
 - **AND** failures include a plain-language next action (`→ …`)
+
+#### Scenario: Four distinct folders in config
+
+- **GIVEN** a config file
+- **THEN** it specifies `source_dir` (local upload), `staging_dir` (linux upload destination), `results_dir` (linux logs/results), and `retrieve_to` (local retrieve)
+- **AND** `staging_dir` and `results_dir` are different paths
+- **WHEN** they are the same path
+- **THEN** the tool exits non-zero with a clear FAIL hint
 
 #### Scenario: Passwords redacted
 

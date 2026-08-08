@@ -37,9 +37,12 @@ class Status:
     def __init__(self, log: logging.Logger):
         self.log = log
 
-    def preflight(self, msg: str, **kv: Any) -> None:
+    def initialization(self, msg: str, **kv: Any) -> None:
         extra = "  ".join(f"{k}={v}" for k, v in kv.items())
-        self.log.info("PRE-FLIGHT | %s%s", msg, f"  {extra}" if extra else "")
+        self.log.info("INITIALIZATION | %s%s", msg, f"  {extra}" if extra else "")
+
+    # Alias kept so older call sites / notes stay readable during transition.
+    preflight = initialization
 
     def file_info(self, name: str, size: int, sha: str) -> None:
         self.log.info(

@@ -19,7 +19,7 @@ Dependencies are expressed so `bd ready` yields a safe sequence.
 - **Depends on**: 1
 
 ### 3. IxDF-style logger
-- Custom formatter + helpers (`preflight`, `transfer`, `verify`, `success`, `fail`, `summary`).
+- Custom formatter + helpers (`initialization`, `transfer`, `verify`, `success`, `fail`, `summary`).
 - Always include concrete paths / sizes / short hashes.
 - **Depends on**: 1
 

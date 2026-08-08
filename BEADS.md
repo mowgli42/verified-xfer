@@ -15,7 +15,7 @@ Ponytail: each bead is the smallest shippable slice. IxDF: status feedback stays
 - `--show-config-paths`; CONFIG log lines; redacted secrets
 
 ### B3 — IxDF-style logger ✅ `vx-0t0.3`
-- `ixdf_log.Status`: preflight / file / transfer / verify / success / fail / summary
+- `ixdf_log.Status`: initialization / file / transfer / verify / success / fail / summary
 
 ### B4 — Hash & size helpers ✅ `vx-0t0.4`
 - stdlib SHA-256 + size
