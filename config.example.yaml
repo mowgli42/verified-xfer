@@ -1,0 +1,32 @@
+# ---------------------------------------------------------------------------
+# verified-xfer configuration
+#
+# Search order (first existing file wins):
+#   1. --config / -c  (explicit)
+#   2. ./config.yaml  (current working directory)
+#   3. User:
+#        Windows → %APPDATA%\verified-xfer\config.yaml
+#        Linux   → ~/.config/verified-xfer/config.yaml
+#   4. System-wide (recommended for shared lab machines):
+#        Windows → %PROGRAMDATA%\verified-xfer\config.yaml
+#        Linux   → /etc/verified-xfer/config.yaml
+#
+# The tool always logs the source + path of the config it actually loaded.
+# ---------------------------------------------------------------------------
+
+backend: local                # "local" (NFS/SMB mount or same host) or "sftp"
+
+# Local paths (Windows or Linux). Prefer forward slashes; pathlib handles both.
+# On Windows avoid unquoted single backslashes (YAML treats \t \n etc. specially).
+source_dir: "D:/testdata/inputs/run-42"
+staging_dir: "/mnt/labshare/staging/run-42"   # remote path seen by the backend
+results_dir: "/mnt/labshare/results/run-42"   # separate folder for outputs + logs
+retrieve_to: "./retrieved/run-42"
+
+# Only required when backend: sftp
+sftp:
+  host: "lab-linux.example"
+  port: 22
+  username: "tester"
+  key_filename: "~/.ssh/id_ed25519"
+  # password: "prefer-keys-instead"
