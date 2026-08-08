@@ -1,0 +1,17 @@
+---
+description: Ponytail minimalism – YAGNI → reuse → stdlib → native → installed dep → one-liner → minimal code
+globs: ["**/*.py", "**/*.yaml", "**/*.md"]
+alwaysApply: true
+---
+
+# Ponytail
+
+When writing or changing code in this repo:
+
+1. **YAGNI** – do not add features, options, or abstractions that are not required by the current OpenSpec scenarios.
+2. Prefer **stdlib** (pathlib, hashlib, logging, argparse, shutil, tempfile).
+3. Only introduce an installed dependency when stdlib cannot do the job cleanly (paramiko for SFTP is the only expected exception).
+4. Keep functions short and linear. Prefer a clear script-like flow over deep class hierarchies.
+5. Logging must follow IxDF visibility-of-system-status: every important step announces what is happening and what the outcome was.
+6. After any change, the Gherkin scenarios in `openspec/specs/file-staging/spec.md` must still be satisfiable.
+7. Ship the smallest change that makes the next Beads task green.
