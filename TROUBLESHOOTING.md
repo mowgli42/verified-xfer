@@ -42,22 +42,23 @@ This prints the exact search order and which files exist.
 
 **Symptoms**
 ```
-FAIL | config missing keys: ['source_dir', …]  → see config.example.yaml
+FAIL | config missing folders: ['source_dir', …]  → see config.example.yaml
 ```
 
 **Fix**  
 Copy from `config.example.yaml` and fill every required field:
-- `source_dir`, `staging_dir`, `results_dir`, `retrieve_to`
+- Four folders: `source_dir` (local upload), `staging_dir` (linux upload),
+  `results_dir` (linux logs — different from staging), `retrieve_to` (local retrieve)
 - when `backend: sftp` also `sftp.host`, `sftp.username`, and either `key_filename` or `password`.
 
 ---
 
-## 3. source_dir does not exist or is empty
+## 3. Local upload folder (source_dir) does not exist or is empty
 
 **Symptoms**
 ```
-FAIL | source_dir does not exist or is not a directory: D:\…  → check config.source_dir
-PRE-FLIGHT | no files found in source_dir
+FAIL | source folder not found: D:\…  → open config.yaml and fix source_dir
+INITIALIZATION | no files found in local upload folder
 ```
 
 **Common Windows causes**
@@ -155,7 +156,7 @@ FAIL | remote file already exists: /staging/foo.bin  → use --force to overwrit
 
 **Symptoms**
 ```
-PRE-FLIGHT | zero files in results_dir – nothing to retrieve
+INITIALIZATION | linux logs/results folder is empty — nothing to retrieve
 SUMMARY    | OK  0/0 files retrieved
 ```
 
@@ -169,7 +170,7 @@ SUMMARY    | OK  0/0 files retrieved
 ## 9. Real-time output / Cursor / CI
 
 The logger writes every status line to **stdout** immediately (no buffering tricks).  
-When Cursor or another agent runs the command you will see the PRE-FLIGHT / TRANSFER / VERIFY / SUCCESS / SUMMARY stream in real time.
+When Cursor or another agent runs the command you will see the INITIALIZATION / TRANSFER / VERIFY / SUCCESS / SUMMARY stream in real time.
 
 To force line buffering in some environments:
 ```bash

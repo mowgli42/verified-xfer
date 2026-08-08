@@ -18,7 +18,7 @@ HH:MM:SS | LEVEL   | TAG        | message  [key=value …]
 
 | Tag | Meaning for operators |
 |-----|------------------------|
-| `PRE-FLIGHT` | Setup check — “here is what we are about to do” |
+| `INITIALIZATION` | Setup — config loaded, four folders shown, ready to copy |
 | `CONFIG` | Which settings file is in use (path + source) |
 | `FILE` | One local file we will copy (name, size, short hash) |
 | `TRANSFER` | Copy in progress (arrow + destination path) |

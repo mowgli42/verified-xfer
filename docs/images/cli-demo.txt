@@ -1,64 +1,67 @@
-Demo root: /tmp/tmp.F9M1KgnA0g
+Demo root: /tmp/tmp.nXZ8ErIr5V
 === STAGE (dry-run) ===
-18:59:24 | INFO    | PRE-FLIGHT | effective configuration
-18:59:24 | INFO    |   CONFIG | source=explicit --config
-18:59:24 | INFO    |   CONFIG | path=/tmp/tmp.F9M1KgnA0g/config.yaml
-18:59:24 | INFO    |   CONFIG | backend=local
-18:59:24 | INFO    |   CONFIG | source_dir=/tmp/tmp.F9M1KgnA0g/source
-18:59:24 | INFO    |   CONFIG | staging_dir=/tmp/tmp.F9M1KgnA0g/staging
-18:59:24 | INFO    |   CONFIG | results_dir=/tmp/tmp.F9M1KgnA0g/results
-18:59:24 | INFO    |   CONFIG | retrieve_to=/tmp/tmp.F9M1KgnA0g/retrieved
-18:59:24 | INFO    | PRE-FLIGHT | 2 file(s) to stage  source=/tmp/tmp.F9M1KgnA0g/source  target=/tmp/tmp.F9M1KgnA0g/staging
-18:59:24 | INFO    | FILE       | meta.txt  size=8  checksum=1afd1b403a9a…
-18:59:24 | INFO    | FILE       | payload.txt  size=15  checksum=14274f8239b5…
-18:59:24 | INFO    | DRY-RUN    | no files will be written
-18:59:24 | INFO    | TRANSFER   | would → /tmp/tmp.F9M1KgnA0g/staging/meta.txt
-18:59:24 | INFO    | TRANSFER   | would → /tmp/tmp.F9M1KgnA0g/staging/payload.txt
-18:59:24 | INFO    | SUMMARY    | OK  2/2 files would be staged (dry-run)
-18:59:24 | INFO    | NEXT       | All 2 file(s) would be staged (dry-run). Safe to continue.
+19:33:14 | INFO    | INITIALIZATION | effective configuration — four folders
+19:33:14 | INFO    |   CONFIG | source=explicit --config
+19:33:14 | INFO    |   CONFIG | path=/tmp/tmp.nXZ8ErIr5V/config.yaml
+19:33:14 | INFO    |   CONFIG | backend=local
+19:33:14 | INFO    |   CONFIG | folders (upload: source_dir→staging_dir; retrieve: results_dir→retrieve_to)
+19:33:14 | INFO    |   CONFIG | source_dir=/tmp/tmp.nXZ8ErIr5V/source  (1 local upload source)
+19:33:14 | INFO    |   CONFIG | staging_dir=/tmp/tmp.nXZ8ErIr5V/staging  (2 linux upload destination)
+19:33:14 | INFO    |   CONFIG | results_dir=/tmp/tmp.nXZ8ErIr5V/results  (3 linux logs/results (separate from upload))
+19:33:14 | INFO    |   CONFIG | retrieve_to=/tmp/tmp.nXZ8ErIr5V/retrieved  (4 local retrieve destination)
+19:33:14 | INFO    | INITIALIZATION | 2 file(s) to upload  local_source=/tmp/tmp.nXZ8ErIr5V/source  linux_upload=/tmp/tmp.nXZ8ErIr5V/staging
+19:33:14 | INFO    | FILE       | meta.txt  size=8  checksum=1afd1b403a9a…
+19:33:14 | INFO    | FILE       | payload.txt  size=15  checksum=14274f8239b5…
+19:33:14 | INFO    | DRY-RUN    | no files will be written
+19:33:14 | INFO    | TRANSFER   | would → /tmp/tmp.nXZ8ErIr5V/staging/meta.txt
+19:33:14 | INFO    | TRANSFER   | would → /tmp/tmp.nXZ8ErIr5V/staging/payload.txt
+19:33:14 | INFO    | SUMMARY    | OK  2/2 files would be staged (dry-run)
+19:33:14 | INFO    | NEXT       | All 2 file(s) would be staged (dry-run). Safe to continue.
 === STAGE ===
-18:59:24 | INFO    | PRE-FLIGHT | effective configuration
-18:59:24 | INFO    |   CONFIG | source=explicit --config
-18:59:24 | INFO    |   CONFIG | path=/tmp/tmp.F9M1KgnA0g/config.yaml
-18:59:24 | INFO    |   CONFIG | backend=local
-18:59:24 | INFO    |   CONFIG | source_dir=/tmp/tmp.F9M1KgnA0g/source
-18:59:24 | INFO    |   CONFIG | staging_dir=/tmp/tmp.F9M1KgnA0g/staging
-18:59:24 | INFO    |   CONFIG | results_dir=/tmp/tmp.F9M1KgnA0g/results
-18:59:24 | INFO    |   CONFIG | retrieve_to=/tmp/tmp.F9M1KgnA0g/retrieved
-18:59:24 | INFO    | PRE-FLIGHT | 2 file(s) to stage  source=/tmp/tmp.F9M1KgnA0g/source  target=/tmp/tmp.F9M1KgnA0g/staging
-18:59:24 | INFO    | FILE       | meta.txt  size=8  checksum=1afd1b403a9a…
-18:59:24 | INFO    | FILE       | payload.txt  size=15  checksum=14274f8239b5…
-18:59:24 | INFO    | TRANSFER   | → /tmp/tmp.F9M1KgnA0g/staging/meta.txt
-18:59:24 | INFO    | VERIFY     | OK   size=8 checksum=1afd1b403a9a…
-18:59:24 | INFO    | SUCCESS    | meta.txt copied and checked at /tmp/tmp.F9M1KgnA0g/staging/meta.txt
-18:59:24 | INFO    | TRANSFER   | → /tmp/tmp.F9M1KgnA0g/staging/payload.txt
-18:59:24 | INFO    | VERIFY     | OK   size=15 checksum=14274f8239b5…
-18:59:24 | INFO    | SUCCESS    | payload.txt copied and checked at /tmp/tmp.F9M1KgnA0g/staging/payload.txt
-18:59:24 | INFO    | SUMMARY    | OK  2/2 files staged
-18:59:24 | INFO    | NEXT       | All 2 file(s) staged. Safe to continue.
+19:33:14 | INFO    | INITIALIZATION | effective configuration — four folders
+19:33:14 | INFO    |   CONFIG | source=explicit --config
+19:33:14 | INFO    |   CONFIG | path=/tmp/tmp.nXZ8ErIr5V/config.yaml
+19:33:14 | INFO    |   CONFIG | backend=local
+19:33:14 | INFO    |   CONFIG | folders (upload: source_dir→staging_dir; retrieve: results_dir→retrieve_to)
+19:33:14 | INFO    |   CONFIG | source_dir=/tmp/tmp.nXZ8ErIr5V/source  (1 local upload source)
+19:33:14 | INFO    |   CONFIG | staging_dir=/tmp/tmp.nXZ8ErIr5V/staging  (2 linux upload destination)
+19:33:14 | INFO    |   CONFIG | results_dir=/tmp/tmp.nXZ8ErIr5V/results  (3 linux logs/results (separate from upload))
+19:33:14 | INFO    |   CONFIG | retrieve_to=/tmp/tmp.nXZ8ErIr5V/retrieved  (4 local retrieve destination)
+19:33:14 | INFO    | INITIALIZATION | 2 file(s) to upload  local_source=/tmp/tmp.nXZ8ErIr5V/source  linux_upload=/tmp/tmp.nXZ8ErIr5V/staging
+19:33:14 | INFO    | FILE       | meta.txt  size=8  checksum=1afd1b403a9a…
+19:33:14 | INFO    | FILE       | payload.txt  size=15  checksum=14274f8239b5…
+19:33:14 | INFO    | TRANSFER   | → /tmp/tmp.nXZ8ErIr5V/staging/meta.txt
+19:33:14 | INFO    | VERIFY     | OK   size=8 checksum=1afd1b403a9a…
+19:33:14 | INFO    | SUCCESS    | meta.txt copied and checked at /tmp/tmp.nXZ8ErIr5V/staging/meta.txt
+19:33:14 | INFO    | TRANSFER   | → /tmp/tmp.nXZ8ErIr5V/staging/payload.txt
+19:33:14 | INFO    | VERIFY     | OK   size=15 checksum=14274f8239b5…
+19:33:14 | INFO    | SUCCESS    | payload.txt copied and checked at /tmp/tmp.nXZ8ErIr5V/staging/payload.txt
+19:33:14 | INFO    | SUMMARY    | OK  2/2 files staged
+19:33:14 | INFO    | NEXT       | All 2 file(s) staged. Safe to continue.
 === Simulate test producing results ===
 === RETRIEVE ===
-18:59:24 | INFO    | PRE-FLIGHT | effective configuration
-18:59:24 | INFO    |   CONFIG | source=explicit --config
-18:59:24 | INFO    |   CONFIG | path=/tmp/tmp.F9M1KgnA0g/config.yaml
-18:59:24 | INFO    |   CONFIG | backend=local
-18:59:24 | INFO    |   CONFIG | source_dir=/tmp/tmp.F9M1KgnA0g/source
-18:59:24 | INFO    |   CONFIG | staging_dir=/tmp/tmp.F9M1KgnA0g/staging
-18:59:24 | INFO    |   CONFIG | results_dir=/tmp/tmp.F9M1KgnA0g/results
-18:59:24 | INFO    |   CONFIG | retrieve_to=/tmp/tmp.F9M1KgnA0g/retrieved
-18:59:24 | INFO    | PRE-FLIGHT | listing remote results  remote=/tmp/tmp.F9M1KgnA0g/results
-18:59:24 | INFO    | PRE-FLIGHT | 2 file(s) to retrieve  target=/tmp/tmp.F9M1KgnA0g/retrieved
-18:59:24 | INFO    | TRANSFER   | ← /tmp/tmp.F9M1KgnA0g/results/answer.txt
-18:59:24 | INFO    | VERIFY     | OK   size=3 checksum=084c799cd551…
-18:59:24 | INFO    | SUCCESS    | answer.txt saved to /tmp/tmp.F9M1KgnA0g/retrieved/answer.txt
-18:59:24 | INFO    | TRANSFER   | ← /tmp/tmp.F9M1KgnA0g/results/test.log
-18:59:24 | INFO    | VERIFY     | OK   size=5 checksum=c26de83abdc9…
-18:59:24 | INFO    | SUCCESS    | test.log saved to /tmp/tmp.F9M1KgnA0g/retrieved/test.log
-18:59:24 | INFO    | SUMMARY    | OK  2/2 files retrieved
-18:59:24 | INFO    | NEXT       | All 2 file(s) retrieved. Safe to continue.
+19:33:14 | INFO    | INITIALIZATION | effective configuration — four folders
+19:33:14 | INFO    |   CONFIG | source=explicit --config
+19:33:14 | INFO    |   CONFIG | path=/tmp/tmp.nXZ8ErIr5V/config.yaml
+19:33:14 | INFO    |   CONFIG | backend=local
+19:33:14 | INFO    |   CONFIG | folders (upload: source_dir→staging_dir; retrieve: results_dir→retrieve_to)
+19:33:14 | INFO    |   CONFIG | source_dir=/tmp/tmp.nXZ8ErIr5V/source  (1 local upload source)
+19:33:14 | INFO    |   CONFIG | staging_dir=/tmp/tmp.nXZ8ErIr5V/staging  (2 linux upload destination)
+19:33:14 | INFO    |   CONFIG | results_dir=/tmp/tmp.nXZ8ErIr5V/results  (3 linux logs/results (separate from upload))
+19:33:14 | INFO    |   CONFIG | retrieve_to=/tmp/tmp.nXZ8ErIr5V/retrieved  (4 local retrieve destination)
+19:33:14 | INFO    | INITIALIZATION | listing linux logs/results folder  linux_logs=/tmp/tmp.nXZ8ErIr5V/results
+19:33:14 | INFO    | INITIALIZATION | 2 file(s) to retrieve  linux_logs=/tmp/tmp.nXZ8ErIr5V/results  local_retrieve=/tmp/tmp.nXZ8ErIr5V/retrieved
+19:33:14 | INFO    | TRANSFER   | ← /tmp/tmp.nXZ8ErIr5V/results/answer.txt
+19:33:14 | INFO    | VERIFY     | OK   size=3 checksum=084c799cd551…
+19:33:14 | INFO    | SUCCESS    | answer.txt saved to /tmp/tmp.nXZ8ErIr5V/retrieved/answer.txt
+19:33:14 | INFO    | TRANSFER   | ← /tmp/tmp.nXZ8ErIr5V/results/test.log
+19:33:14 | INFO    | VERIFY     | OK   size=5 checksum=c26de83abdc9…
+19:33:14 | INFO    | SUCCESS    | test.log saved to /tmp/tmp.nXZ8ErIr5V/retrieved/test.log
+19:33:14 | INFO    | SUMMARY    | OK  2/2 files retrieved
+19:33:14 | INFO    | NEXT       | All 2 file(s) retrieved. Safe to continue.
 === Retrieved contents ===
 total 8
--rw-rw-r-- 1 tprettol tprettol 3 Aug  8 18:59 answer.txt
--rw-rw-r-- 1 tprettol tprettol 5 Aug  8 18:59 test.log
+-rw-rw-r-- 1 tprettol tprettol 3 Aug  8 19:33 answer.txt
+-rw-rw-r-- 1 tprettol tprettol 5 Aug  8 19:33 test.log
 PASS
-Demo complete.  Temp dir left at /tmp/tmp.F9M1KgnA0g (remove manually).
+Demo complete.  Temp dir left at /tmp/tmp.nXZ8ErIr5V (remove manually).

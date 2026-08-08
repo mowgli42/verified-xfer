@@ -6,21 +6,31 @@
 #   2. ./config.yaml  (current working directory)
 #   3. User:
 #        Windows → %APPDATA%\verified-xfer\config.yaml
-#        Linux   → ~/.config/verified-xfer/config.yaml
+#        Linux   → ~/.config/verified-xfer\config.yaml
 #   4. System-wide (recommended for shared lab machines):
 #        Windows → %PROGRAMDATA%\verified-xfer\config.yaml
-#        Linux   → /etc/verified-xfer/config.yaml
+#        Linux   → /etc/verified-xfer\config.yaml
 #
 # The tool always logs the source + path of the config it actually loaded.
 # ---------------------------------------------------------------------------
 
 backend: local                # "local" (NFS/SMB mount or same host) or "sftp"
 
-# Local paths (Windows or Linux). Prefer forward slashes; pathlib handles both.
-# On Windows avoid unquoted single backslashes (YAML treats \t \n etc. specially).
+# ---------------------------------------------------------------------------
+# Four folders (all required). Prefer forward slashes on Windows.
+#
+#   1. source_dir   — LOCAL folder with files to upload (stage)
+#   2. staging_dir  — LINUX folder that receives the upload
+#   3. results_dir  — LINUX folder for log/result data AFTER the test
+#                     (must be a different path from staging_dir)
+#   4. retrieve_to  — LOCAL folder where retrieved logs/results are saved
+#
+# Upload path:   source_dir  →  staging_dir
+# Retrieve path: results_dir →  retrieve_to
+# ---------------------------------------------------------------------------
 source_dir: "D:/testdata/inputs/run-42"
-staging_dir: "/mnt/labshare/staging/run-42"   # remote path seen by the backend
-results_dir: "/mnt/labshare/results/run-42"   # separate folder for outputs + logs
+staging_dir: "/mnt/labshare/staging/run-42"
+results_dir: "/mnt/labshare/results/run-42"
 retrieve_to: "./retrieved/run-42"
 
 # Only required when backend: sftp

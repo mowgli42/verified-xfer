@@ -4,9 +4,8 @@ from __future__ import annotations
 
 import argparse
 import sys
-from pathlib import Path
 
-from .config import candidate_paths, format_config_summary, load_config
+from .config import candidate_paths, format_config_summary, load_config, validate_folders
 from .core import retrieve, stage
 from .ixdf_log import Status, setup_logging
 
@@ -14,7 +13,10 @@ from .ixdf_log import Status, setup_logging
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="verified-xfer",
-        description="Verified stage of test files to a Linux share + retrieve of results/logs.",
+        description=(
+            "Upload test files from a local folder to a Linux folder, "
+            "then retrieve logs/results from a separate Linux folder."
+        ),
     )
     parser.add_argument("command", choices=["stage", "retrieve"], help="Action to perform")
     parser.add_argument(
@@ -57,14 +59,13 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     # Always show the effective config early (IxDF visibility)
-    status.preflight("effective configuration")
+    status.initialization("effective configuration — four folders")
     for line in format_config_summary(cfg, cfg_path, source_label):
         status.info(f"  CONFIG | {line}")
 
-    required = ["source_dir", "staging_dir", "results_dir", "retrieve_to"]
-    missing = [k for k in required if k not in cfg]
-    if missing:
-        status.fail(f"config missing keys: {missing}", "see config.example.yaml / TROUBLESHOOTING.md")
+    folder_err = validate_folders(cfg)
+    if folder_err:
+        status.fail(folder_err, "see the four-folder section in config.example.yaml")
         return 1
 
     if args.command == "stage":

@@ -63,3 +63,16 @@ def test_dry_run_writes_nothing():
         rc = stage(cfg, status, dry_run=True)
         assert rc == 0
         assert list((tmp / "staging").iterdir()) == []
+
+
+def test_staging_and_results_must_differ():
+    from verified_xfer.config import validate_folders
+
+    with tempfile.TemporaryDirectory() as td:
+        tmp = Path(td)
+        cfg = _cfg(tmp)
+        assert validate_folders(cfg) is None
+        cfg["results_dir"] = cfg["staging_dir"]
+        err = validate_folders(cfg)
+        assert err is not None
+        assert "different folders" in err

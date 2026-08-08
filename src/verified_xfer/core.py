@@ -40,11 +40,15 @@ def stage(cfg: dict[str, Any], status: Status, *, dry_run: bool = False, force: 
 
     files = sorted(p for p in source.iterdir() if p.is_file())
     if not files:
-        status.preflight("no files found in source folder", path=str(source))
+        status.initialization("no files found in local upload folder", path=str(source))
         status.summary(0, 0, "staged")
         return 0
 
-    status.preflight(f"{len(files)} file(s) to stage", source=str(source), target=staging)
+    status.initialization(
+        f"{len(files)} file(s) to upload",
+        local_source=str(source),
+        linux_upload=staging,
+    )
     local_meta: list[tuple[Path, int, str]] = []
     for p in files:
         sz = file_size(p)
@@ -109,22 +113,26 @@ def retrieve(cfg: dict[str, Any], status: Status, *, dry_run: bool = False) -> i
     dest = Path(cfg["retrieve_to"])
     backend = load_backend(cfg)
 
-    status.preflight("listing remote results", remote=results)
+    status.initialization("listing linux logs/results folder", linux_logs=results)
     try:
         names = backend.list_files(results)
     except Exception as exc:
         status.fail(
-            f"cannot open results folder: {exc}",
-            "confirm results_dir in config.yaml and that the share is mounted",
+            f"cannot open linux logs/results folder: {exc}",
+            "confirm results_dir in config.yaml (separate from staging_dir) and that the share is mounted",
         )
         return 1
 
     if not names:
-        status.preflight("results folder is empty — nothing to retrieve")
+        status.initialization("linux logs/results folder is empty — nothing to retrieve")
         status.summary(0, 0, "retrieved")
         return 0
 
-    status.preflight(f"{len(names)} file(s) to retrieve", target=str(dest))
+    status.initialization(
+        f"{len(names)} file(s) to retrieve",
+        linux_logs=results,
+        local_retrieve=str(dest),
+    )
     if dry_run:
         for name in names:
             status.transfer("would ←", f"{results}/{name}")
