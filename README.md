@@ -88,6 +88,31 @@ See [BEADS.md](BEADS.md), [openspec/specs/file-staging/spec.md](openspec/specs/f
 
 ## Quick start
 
+### Windows (PowerShell or Command Prompt)
+
+```powershell
+pip install -e ".[sftp]"   # or: pip install -e .
+
+copy config.example.yaml config.yaml
+# edit the four folder paths in config.yaml
+
+# Wrapper (finds py/python automatically; unbuffered status lines)
+.\examples\verified-xfer.ps1 stage --show-config-paths
+.\examples\verified-xfer.ps1 stage --dry-run
+.\examples\verified-xfer.ps1 stage
+# … run your external test …
+.\examples\verified-xfer.ps1 retrieve
+
+# Same via cmd.exe:
+examples\verified-xfer.bat stage --dry-run
+
+# Local four-folder demo (no real share needed):
+.\examples\local-demo.ps1
+examples\local-demo.bat
+```
+
+### Linux / macOS
+
 ```bash
 pip install -e ".[sftp]"   # or: pip install -e .   (local/NFS only)
 
@@ -95,18 +120,18 @@ pip install -e ".[sftp]"   # or: pip install -e .   (local/NFS only)
 cp config.example.yaml config.yaml
 # edit the four folder paths
 
-# Option B – one config for the whole Windows lab PC (admin once)
-#   mkdir "%PROGRAMDATA%\verified-xfer"
-#   copy config.example.yaml "%PROGRAMDATA%\verified-xfer\config.yaml"
-
 python -m verified_xfer stage --show-config-paths   # where we look
 python -m verified_xfer stage --dry-run             # practice, no writes
 python -m verified_xfer stage                       # copy + check inputs
 # … run your external test …
 python -m verified_xfer retrieve                    # pull results + logs
+
+bash examples/local-demo.sh
 ```
 
-If a terminal buffers output: `python -u -m verified_xfer …`.
+Lab-wide Windows config (admin once): copy `config.example.yaml` to `%PROGRAMDATA%\verified-xfer\config.yaml`.
+
+If a terminal buffers output: `python -u -m verified_xfer …` (the `.bat` / `.ps1` wrappers already set `PYTHONUNBUFFERED=1`).
 
 ## Config search order
 
@@ -130,6 +155,8 @@ openspec/specs/file-staging/   # Gherkin acceptance contract
 openspec/changes/initial/      # proposal, design, tasks
 beads via bd (vx-*) + BEADS.md
 src/verified_xfer/             # minimal implementation
+examples/verified-xfer.ps1|.bat  # Windows wrappers
+examples/local-demo.ps1|.bat|.sh # four-folder local demos
 .cursor/rules/                 # ponytail + ixdf-operator-feedback + repo-health
 .cursor/skills/                # Repo Health Loop fix-lane skills
 DESIGN.md                      # operator feedback voice (IxDF)
