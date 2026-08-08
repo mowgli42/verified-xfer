@@ -1,14 +1,6 @@
-# Agent notes
+# Project Instructions for AI Agents
 
-This repo follows **OpenSpec (behaviour-driven) → Beads → Ponytail code**, with **IxDF operator feedback** for non-technical lab users.
-
-1. Read `openspec/specs/file-staging/spec.md` (Gherkin is the acceptance contract).
-2. Read `BEADS.md` or run `bd ready` (epic `vx-0t0`).
-3. Obey `.cursor/rules/ponytail.mdc` — smallest working change.
-4. Obey `.cursor/rules/ixdf-operator-feedback.mdc` — status lines stay loud and plain; every FAIL has a `→` next step. See `DESIGN.md`.
-5. Do not silence `PRE-FLIGHT` / `CONFIG` / `TRANSFER` / `VERIFY` / `SUCCESS` / `SUMMARY` / `NEXT`.
-
-When adding behaviour: update Gherkin first, then Beads, then code.
+This file provides instructions and context for AI coding agents working on this project.
 
 <!-- BEGIN BEADS INTEGRATION v:1 profile:minimal hash:7510c1e2 -->
 ## Beads Issue Tracker
@@ -57,3 +49,22 @@ bd close <id>         # Complete work
 - NEVER say "ready to push when you are" - YOU must push
 - If push fails, resolve and retry until it succeeds
 <!-- END BEADS INTEGRATION -->
+
+
+## Build & Test
+
+_Add your build and test commands here_
+
+```bash
+# Example:
+# npm install
+# npm test
+```
+
+## Architecture Overview
+
+_Add a brief overview of your project architecture_
+
+## Conventions & Patterns
+
+_Add your project-specific conventions here_

@@ -48,8 +48,9 @@ def main(argv: list[str] | None = None) -> int:
     if not cfg:
         status.fail(
             "no config file found",
-            "copy config.example.yaml to one of the locations shown by --show-config-paths",
+            "copy config.example.yaml to a search location, then re-run",
         )
+        status.next_step("Run with --show-config-paths to see exactly where we look.")
         status.info("Searched:")
         for label, path in candidate_paths(args.config):
             status.info(f"  {label}: {path}")

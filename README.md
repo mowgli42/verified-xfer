@@ -1,100 +1,131 @@
 # verified-xfer
 
-**Simple, heavily verified file staging + retrieval between Windows local storage and a Linux shared folder (SFTP / NFS mount / local path).**
+Copy test files to a Linux share, then pull results back — with a check on every file.
 
-Designed for test workflows:
+Built for lab operators: each step prints plain status (`PRE-FLIGHT` → `TRANSFER` → `VERIFY` → `SUCCESS` / `FAIL` → `SUMMARY` → `NEXT`) so you always know what happened and what to do next. No GUI, no daemon — one small Python CLI.
 
-1. Stage input data & config into a known remote folder.
-2. Run the system under test (external).
-3. Retrieve results + logs from a separate remote folder.
-4. Confirm every file landed where expected, with hashes and explicit status feedback.
+## CLI session capture
 
-Follows **Ponytail minimalism**, OpenSpec + Gherkin behaviour specs, and Beads-style sequential development. Logging and CLI feedback follow IxDF / Nielsen visibility-of-system-status principles: always tell the operator what is happening, what just succeeded or failed, and what the next safe action is.
+From `examples/local-demo.sh` (full log: [docs/images/cli-demo.txt](docs/images/cli-demo.txt)):
+
+```text
+=== STAGE ===
+PRE-FLIGHT | 2 file(s) to stage
+FILE       | meta.txt  size=8  checksum=1afd1b403a9a…
+TRANSFER   | → …/staging/meta.txt
+VERIFY     | OK   size=8 checksum=1afd1b403a9a…
+SUCCESS    | meta.txt copied and checked at …/staging/meta.txt
+SUMMARY    | OK  2/2 files staged
+NEXT       | All 2 file(s) staged. Safe to continue.
+
+=== RETRIEVE ===
+SUMMARY    | OK  2/2 files retrieved
+NEXT       | All 2 file(s) retrieved. Safe to continue.
+```
+
+## Architecture
+
+```mermaid
+flowchart LR
+  subgraph Windows_or_Linux["Operator machine"]
+    SRC[source_dir<br/>test inputs]
+    RET[retrieve_to<br/>results home]
+    CLI[verified-xfer CLI]
+  end
+  subgraph Share["Linux share / SFTP host"]
+    STG[staging_dir]
+    RES[results_dir]
+  end
+  SRC -->|stage + verify| CLI
+  CLI -->|copy + checksum| STG
+  RES -->|retrieve + verify| CLI
+  CLI --> RET
+```
+
+- **local** backend — NFS / SMB / CIFS already mounted (or same machine).
+- **sftp** backend — true remote host via paramiko (optional install).
+
+## Sequence — stage then retrieve
+
+```mermaid
+sequenceDiagram
+  actor Op as Operator
+  participant CLI as verified-xfer
+  participant Share as Staging / results folders
+  Op->>CLI: stage
+  CLI->>CLI: Load config (print CONFIG path)
+  CLI->>CLI: Hash each local file
+  CLI->>Share: Copy file
+  CLI->>Share: Recheck size + checksum
+  CLI-->>Op: SUCCESS / FAIL + NEXT
+  Note over Op: External test runs (out of scope)
+  Op->>CLI: retrieve
+  CLI->>Share: List results_dir
+  CLI->>Op: Copy into retrieve_to + verify
+  CLI-->>Op: SUMMARY + NEXT
+```
+
+## Remaining / planned
+
+| Item | Tracking |
+|------|----------|
+| Automated SFTP backend test (mocked or lab host) | [#2](https://github.com/mowgli42/verified-xfer/issues/2) |
+| Watch-for-test-complete / GUI / service wrappers | Out of scope (YAGNI) |
+
+Initial epic beads B1–B12 are done — see [BEADS.md](BEADS.md).
+
+Process: OpenSpec + Gherkin → Beads (`bd ready`) → Ponytail-minimal code.  
+See [BEADS.md](BEADS.md), [openspec/specs/file-staging/spec.md](openspec/specs/file-staging/spec.md), [DESIGN.md](DESIGN.md).
 
 ## Quick start
 
 ```bash
-# install (stdlib + one optional dep)
-pip install -e ".[sftp]"   # or just: pip install pyyaml paramiko
+pip install -e ".[sftp]"   # or: pip install -e .   (local/NFS only)
 
-# Option A – local config in the current directory
+# Option A – config in the current folder
 cp config.example.yaml config.yaml
-# edit config.yaml
+# edit the four folder paths
 
-# Option B – system-wide config on a Windows lab machine (admin once)
+# Option B – one config for the whole Windows lab PC (admin once)
 #   mkdir "%PROGRAMDATA%\verified-xfer"
 #   copy config.example.yaml "%PROGRAMDATA%\verified-xfer\config.yaml"
-#   (then every operator on the machine picks it up automatically)
 
-# see which config file will be used
-python -m verified_xfer stage --show-config-paths
-
-# dry-run staging (no writes) – realtime status on stdout
-python -m verified_xfer stage --dry-run
-
-# real stage with verification
-python -m verified_xfer stage
-
-# after test finishes
-python -m verified_xfer retrieve
+python -m verified_xfer stage --show-config-paths   # where we look
+python -m verified_xfer stage --dry-run             # practice, no writes
+python -m verified_xfer stage                       # copy + check inputs
+# … run your external test …
+python -m verified_xfer retrieve                    # pull results + logs
 ```
+
+If a terminal buffers output: `python -u -m verified_xfer …`.
 
 ## Config search order
 
-The tool checks these locations **in order** and uses the first file that exists.  
-The chosen source and full path are always printed in the log under `CONFIG | …`.
+First existing file wins. The chosen path is always printed under `CONFIG | …`.
 
-1. `--config / -c` (explicit path)
-2. `./config.yaml` (current working directory)
-3. **User**
-   - Windows: `%APPDATA%\verified-xfer\config.yaml`
-   - Linux/macOS: `~/.config/verified-xfer/config.yaml`
-4. **System-wide** (recommended for shared lab PCs)
-   - Windows: `%PROGRAMDATA%\verified-xfer\config.yaml`
-   - Linux: `/etc/verified-xfer/config.yaml`
+1. `--config` / `-c`
+2. `./config.yaml`
+3. User — `%APPDATA%\verified-xfer\` (Windows) or `~/.config/verified-xfer/`
+4. System-wide — `%PROGRAMDATA%\verified-xfer\` (Windows) or `/etc/verified-xfer/`
 
-Passwords are redacted in the log; key paths are shown.
-
-## Real-time output
-
-All status lines (`PRE-FLIGHT`, `CONFIG`, `FILE`, `TRANSFER`, `VERIFY`, `SUCCESS`, `FAIL`, `SUMMARY`) are written immediately to **stdout**.  
-Cursor, terminals, and CI see the live stream with no extra flags.  
-If a particular environment buffers, use `python -u -m verified_xfer …`.
-
-## Design goals
-
-- **Lots of verification** – existence, size, SHA-256 before and after; remote listing confirmation; clear failure messages.
-- **Right folder guarantee** – target path is checked; files are only considered “placed” after remote confirmation.
-- **Separate retrieve path** – results/logs live in a different remote directory from the staging input.
-- **Simple Python** – pathlib, hashlib, logging; paramiko only when SFTP is required. NFS is just a mounted local path.
-- **IxDF-style feedback** – every step announces status, progress, and outcome so the operator never has to guess.
-- **System-wide config** – one machine-wide YAML for the whole lab, still overridable per user or per run.
+Passwords are hidden in the log; key paths are shown.
 
 ## Troubleshooting
 
-See **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** for the full catalogue of failure modes (config discovery, permissions, SFTP auth, hash mismatches, overwrite protection, empty results, etc.) with concrete recovery steps.
+**[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** — config discovery, permissions, SFTP auth, checksum mismatches, overwrite protection, empty results — each with recovery steps.
 
 ## Repo layout
 
 ```
-openspec/                 # source of truth for behaviour
-  specs/file-staging/     # Gherkin scenarios + requirements
-  changes/initial/        # proposal, design, tasks
-src/verified_xfer/        # minimal implementation
-.cursor/rules/ponytail.mdc
-config.example.yaml
-TROUBLESHOOTING.md
+openspec/specs/file-staging/   # Gherkin acceptance contract
+openspec/changes/initial/      # proposal, design, tasks
+beads via bd (vx-*) + BEADS.md
+src/verified_xfer/             # minimal implementation
+.cursor/rules/                 # ponytail + ixdf-operator-feedback + repo-health
+.cursor/skills/                # Repo Health Loop fix-lane skills
+DESIGN.md                      # operator feedback voice (IxDF)
 ```
-
-See `openspec/changes/initial/proposal.md` and `tasks.md` for the development sequence (OpenSpec → Beads-ready tasks). Cursor can continue from the remaining Beads tasks.
-
-## Supported backends
-
-| Backend | When to use | Notes |
-|---------|-------------|-------|
-| `local` | NFS / SMB / CIFS already mounted, or same machine | Uses `pathlib` + `shutil`. Fastest verification. |
-| `sftp`  | True remote Linux host | paramiko. Hash verification by temporary re-download. |
 
 ## License
 
-MIT – keep it simple.
+MIT — keep it simple.

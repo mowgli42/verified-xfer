@@ -1,0 +1,31 @@
+---
+description: IxDF operator feedback for non-technical lab users — plain status, recovery hints, recognition over recall
+globs: ["**/*.py", "**/*.md", "**/*.yaml"]
+alwaysApply: true
+---
+
+# IxDF operator feedback (non-technical users)
+
+Ponytail decides how little code to write. **This rule decides how the tool talks.**
+
+Operators are often lab technicians, not developers. Treat stdout + docs as the product UI.
+
+## Required behaviours
+
+1. **Visibility of system status** — Keep tagged lines: `PRE-FLIGHT`, `CONFIG`, `FILE`, `TRANSFER`, `VERIFY`, `SUCCESS` / `FAIL`, `SUMMARY`. Do not silence them for “cleaner” logs.
+2. **Plain language** — Prefer folder/file/copy/check over payload/artifact/egress/ingress. Short sentences.
+3. **Recovery on every FAIL** — End FAIL lines with `→ <next safe action>`. Point at TROUBLESHOOTING.md or a concrete flag (`--force`, `--show-config-paths`) when useful.
+4. **Recognition over recall** — Show the effective config path; `--show-config-paths` must stay accurate.
+5. **Error prevention** — Keep overwrite protection unless `--force`; keep `--dry-run`.
+6. **Docs voice** — README / TROUBLESHOOTING lead with what the operator sees and does, not internals.
+
+## When changing copy
+
+- Update `DESIGN.md` if you add a new status tag or change the voice rules.
+- Keep Gherkin in `openspec/specs/file-staging/spec.md` satisfiable (IxDF scenarios).
+- Never trade away validation, hash checks, or redaction of passwords for fewer lines.
+
+## Reference
+
+- Interaction Design Foundation / Nielsen: visibility of system status, match the real world, help users recover, recognition rather than recall.
+- Project design notes: `DESIGN.md`

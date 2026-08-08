@@ -32,12 +32,16 @@ def stage(cfg: dict[str, Any], status: Status, *, dry_run: bool = False, force: 
     backend = load_backend(cfg)
 
     if not source.is_dir():
-        status.fail(f"source_dir does not exist or is not a directory: {source}", "check config.source_dir")
+        status.fail(
+            f"source folder not found: {source}",
+            "open config.yaml and fix source_dir (use forward slashes on Windows)",
+        )
         return 1
 
     files = sorted(p for p in source.iterdir() if p.is_file())
     if not files:
-        status.preflight("no files found in source_dir", path=str(source))
+        status.preflight("no files found in source folder", path=str(source))
+        status.summary(0, 0, "staged")
         return 0
 
     status.preflight(f"{len(files)} file(s) to stage", source=str(source), target=staging)
@@ -65,7 +69,10 @@ def stage(cfg: dict[str, Any], status: Status, *, dry_run: bool = False, force: 
                 try:
                     existing = backend.list_files(staging)
                     if p.name in existing:
-                        status.fail(f"remote file already exists: {remote}", "use --force to overwrite")
+                        status.fail(
+                            f"a file named {p.name} is already in the staging folder",
+                            "move/rename it, or re-run with --force to replace it",
+                        )
                         continue
                 except Exception:
                     pass
@@ -75,15 +82,21 @@ def stage(cfg: dict[str, Any], status: Status, *, dry_run: bool = False, force: 
             size_ok = remote_size == expected_size
             hash_ok = remote_sha == expected_sha
             if size_ok and hash_ok:
-                status.verify(True, f"size={remote_size} hash={expected_sha[:12]}…")
-                status.success(f"{p.name} placed and verified at {remote}")
+                status.verify(True, f"size={remote_size} checksum={expected_sha[:12]}…")
+                status.success(f"{p.name} copied and checked at {remote}")
                 ok += 1
             else:
                 detail = f"size {'OK' if size_ok else 'MISMATCH'}  hash {'OK' if hash_ok else 'MISMATCH'}"
                 status.verify(False, detail)
-                status.fail(f"verification failed for {p.name}", "delete remote file and re-run stage")
+                status.fail(
+                    f"check failed for {p.name} — copy may be incomplete or in the wrong folder",
+                    "delete that remote file and run stage again",
+                )
         except Exception as exc:
-            status.fail(f"transfer/verify error for {p.name}: {exc}", "check permissions and connectivity")
+            status.fail(
+                f"could not copy or check {p.name}: {exc}",
+                "confirm you can open the share folder and have write permission",
+            )
 
     status.summary(ok, len(files), "staged")
     if hasattr(backend, "close"):
@@ -100,11 +113,14 @@ def retrieve(cfg: dict[str, Any], status: Status, *, dry_run: bool = False) -> i
     try:
         names = backend.list_files(results)
     except Exception as exc:
-        status.fail(f"cannot list results_dir: {exc}", "check path and connectivity")
+        status.fail(
+            f"cannot open results folder: {exc}",
+            "confirm results_dir in config.yaml and that the share is mounted",
+        )
         return 1
 
     if not names:
-        status.preflight("zero files in results_dir – nothing to retrieve")
+        status.preflight("results folder is empty — nothing to retrieve")
         status.summary(0, 0, "retrieved")
         return 0
 
@@ -127,14 +143,17 @@ def retrieve(cfg: dict[str, Any], status: Status, *, dry_run: bool = False) -> i
             local_size = file_size(local)
             local_sha = file_sha256(local)
             if local_size == remote_size:
-                status.verify(True, f"size={local_size} sha256={local_sha[:12]}…")
-                status.success(f"{name} retrieved to {local}")
+                status.verify(True, f"size={local_size} checksum={local_sha[:12]}…")
+                status.success(f"{name} saved to {local}")
                 ok += 1
             else:
                 status.verify(False, f"size mismatch local={local_size} remote={remote_size}")
-                status.fail(f"size mismatch for {name}", "re-run retrieve")
+                status.fail(f"size check failed for {name}", "run retrieve again")
         except Exception as exc:
-            status.fail(f"retrieve error for {name}: {exc}", "check permissions and disk space")
+            status.fail(
+                f"could not retrieve {name}: {exc}",
+                "check folder permissions and free disk space",
+            )
 
     status.summary(ok, len(names), "retrieved")
     if hasattr(backend, "close"):

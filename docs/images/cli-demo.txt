@@ -1,0 +1,64 @@
+Demo root: /tmp/tmp.F9M1KgnA0g
+=== STAGE (dry-run) ===
+18:59:24 | INFO    | PRE-FLIGHT | effective configuration
+18:59:24 | INFO    |   CONFIG | source=explicit --config
+18:59:24 | INFO    |   CONFIG | path=/tmp/tmp.F9M1KgnA0g/config.yaml
+18:59:24 | INFO    |   CONFIG | backend=local
+18:59:24 | INFO    |   CONFIG | source_dir=/tmp/tmp.F9M1KgnA0g/source
+18:59:24 | INFO    |   CONFIG | staging_dir=/tmp/tmp.F9M1KgnA0g/staging
+18:59:24 | INFO    |   CONFIG | results_dir=/tmp/tmp.F9M1KgnA0g/results
+18:59:24 | INFO    |   CONFIG | retrieve_to=/tmp/tmp.F9M1KgnA0g/retrieved
+18:59:24 | INFO    | PRE-FLIGHT | 2 file(s) to stage  source=/tmp/tmp.F9M1KgnA0g/source  target=/tmp/tmp.F9M1KgnA0g/staging
+18:59:24 | INFO    | FILE       | meta.txt  size=8  checksum=1afd1b403a9a…
+18:59:24 | INFO    | FILE       | payload.txt  size=15  checksum=14274f8239b5…
+18:59:24 | INFO    | DRY-RUN    | no files will be written
+18:59:24 | INFO    | TRANSFER   | would → /tmp/tmp.F9M1KgnA0g/staging/meta.txt
+18:59:24 | INFO    | TRANSFER   | would → /tmp/tmp.F9M1KgnA0g/staging/payload.txt
+18:59:24 | INFO    | SUMMARY    | OK  2/2 files would be staged (dry-run)
+18:59:24 | INFO    | NEXT       | All 2 file(s) would be staged (dry-run). Safe to continue.
+=== STAGE ===
+18:59:24 | INFO    | PRE-FLIGHT | effective configuration
+18:59:24 | INFO    |   CONFIG | source=explicit --config
+18:59:24 | INFO    |   CONFIG | path=/tmp/tmp.F9M1KgnA0g/config.yaml
+18:59:24 | INFO    |   CONFIG | backend=local
+18:59:24 | INFO    |   CONFIG | source_dir=/tmp/tmp.F9M1KgnA0g/source
+18:59:24 | INFO    |   CONFIG | staging_dir=/tmp/tmp.F9M1KgnA0g/staging
+18:59:24 | INFO    |   CONFIG | results_dir=/tmp/tmp.F9M1KgnA0g/results
+18:59:24 | INFO    |   CONFIG | retrieve_to=/tmp/tmp.F9M1KgnA0g/retrieved
+18:59:24 | INFO    | PRE-FLIGHT | 2 file(s) to stage  source=/tmp/tmp.F9M1KgnA0g/source  target=/tmp/tmp.F9M1KgnA0g/staging
+18:59:24 | INFO    | FILE       | meta.txt  size=8  checksum=1afd1b403a9a…
+18:59:24 | INFO    | FILE       | payload.txt  size=15  checksum=14274f8239b5…
+18:59:24 | INFO    | TRANSFER   | → /tmp/tmp.F9M1KgnA0g/staging/meta.txt
+18:59:24 | INFO    | VERIFY     | OK   size=8 checksum=1afd1b403a9a…
+18:59:24 | INFO    | SUCCESS    | meta.txt copied and checked at /tmp/tmp.F9M1KgnA0g/staging/meta.txt
+18:59:24 | INFO    | TRANSFER   | → /tmp/tmp.F9M1KgnA0g/staging/payload.txt
+18:59:24 | INFO    | VERIFY     | OK   size=15 checksum=14274f8239b5…
+18:59:24 | INFO    | SUCCESS    | payload.txt copied and checked at /tmp/tmp.F9M1KgnA0g/staging/payload.txt
+18:59:24 | INFO    | SUMMARY    | OK  2/2 files staged
+18:59:24 | INFO    | NEXT       | All 2 file(s) staged. Safe to continue.
+=== Simulate test producing results ===
+=== RETRIEVE ===
+18:59:24 | INFO    | PRE-FLIGHT | effective configuration
+18:59:24 | INFO    |   CONFIG | source=explicit --config
+18:59:24 | INFO    |   CONFIG | path=/tmp/tmp.F9M1KgnA0g/config.yaml
+18:59:24 | INFO    |   CONFIG | backend=local
+18:59:24 | INFO    |   CONFIG | source_dir=/tmp/tmp.F9M1KgnA0g/source
+18:59:24 | INFO    |   CONFIG | staging_dir=/tmp/tmp.F9M1KgnA0g/staging
+18:59:24 | INFO    |   CONFIG | results_dir=/tmp/tmp.F9M1KgnA0g/results
+18:59:24 | INFO    |   CONFIG | retrieve_to=/tmp/tmp.F9M1KgnA0g/retrieved
+18:59:24 | INFO    | PRE-FLIGHT | listing remote results  remote=/tmp/tmp.F9M1KgnA0g/results
+18:59:24 | INFO    | PRE-FLIGHT | 2 file(s) to retrieve  target=/tmp/tmp.F9M1KgnA0g/retrieved
+18:59:24 | INFO    | TRANSFER   | ← /tmp/tmp.F9M1KgnA0g/results/answer.txt
+18:59:24 | INFO    | VERIFY     | OK   size=3 checksum=084c799cd551…
+18:59:24 | INFO    | SUCCESS    | answer.txt saved to /tmp/tmp.F9M1KgnA0g/retrieved/answer.txt
+18:59:24 | INFO    | TRANSFER   | ← /tmp/tmp.F9M1KgnA0g/results/test.log
+18:59:24 | INFO    | VERIFY     | OK   size=5 checksum=c26de83abdc9…
+18:59:24 | INFO    | SUCCESS    | test.log saved to /tmp/tmp.F9M1KgnA0g/retrieved/test.log
+18:59:24 | INFO    | SUMMARY    | OK  2/2 files retrieved
+18:59:24 | INFO    | NEXT       | All 2 file(s) retrieved. Safe to continue.
+=== Retrieved contents ===
+total 8
+-rw-rw-r-- 1 tprettol tprettol 3 Aug  8 18:59 answer.txt
+-rw-rw-r-- 1 tprettol tprettol 5 Aug  8 18:59 test.log
+PASS
+Demo complete.  Temp dir left at /tmp/tmp.F9M1KgnA0g (remove manually).
