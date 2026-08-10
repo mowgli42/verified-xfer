@@ -24,7 +24,15 @@
 
 - FastAPI + real SFTP will block the worker thread for the duration of large transfers; fine for lab files, not for multi-GB concurrent jobs.  
 - No auth on the local web UI — acceptable only because bind is `127.0.0.1`.  
-- Static path resolution depends on running from the editable install / repo layout.
+- Static path resolution depends on running from the editable install / repo layout.  
+- **Vercel cannot run real transfers** — chose a static sample-log replay (`demo/`) instead of pretending serverless can mount NFS. Trade-off documented in DEMO.md.
+
+## Vercel slice
+
+- Tried: ship FastAPI to Vercel serverless.  
+- **Chose:** static `demo/` + `api/health.js` + replay of `docs/sample-logs` lines.  
+- Why: graham-bell remote review needs screenshots + clickable status stream without lab shares.  
+- Failure avoided: a broken “Run” button that 500s on every Vercel invoke.
 
 ## Validated by this slice
 

@@ -49,7 +49,22 @@ Ponytail: each bead is the smallest shippable slice. IxDF: status feedback stays
 - `DESIGN.md` + `.cursor/rules/ixdf-operator-feedback.mdc`
 - Plain-language NEXT / FAIL hints for lab operators
 
+## Done — graham-bell web / Vercel
+
+### B13 — Local FastAPI UI + SSE log ✅
+- `verified_xfer.web.app`, `static/index.html`, Status `on_line` dual-sink
+
+### B14 — Vercel public demo + screenshots ✅
+- `demo/` static replay site, `vercel.json`, `/api/health`
+- Screenshots in `docs/demo/`; sample logs in `docs/sample-logs/`
+
+## Remaining (production rebuild)
+
+### B15 — Hosted job API (auth + durable history) ⏳
+- Beyond localhost: auth, job queue, no browser upload of whole trees
+- See `openspec/changes/web-ui/proposal.md` out-of-scope
+
 ## Out of scope (YAGNI)
 
 Watching for test completion, parallel bulk transfers, encryption beyond SFTP,
-Windows service wrappers, GUI, database.
+Windows service wrappers, database until B15.

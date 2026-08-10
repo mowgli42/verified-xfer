@@ -1,0 +1,17 @@
+21:24:33 | INFO    | INITIALIZATION | effective configuration — four folders
+21:24:33 | INFO    |   CONFIG | source=explicit --config
+21:24:33 | INFO    |   CONFIG | path=./config.yaml
+21:24:33 | INFO    |   CONFIG | backend=local
+21:24:33 | INFO    |   CONFIG | folders (upload: source_dir→staging_dir; retrieve: results_dir→retrieve_to)
+21:24:33 | INFO    |   CONFIG | source_dir=/demo/run-42/source  (1 local upload source)
+21:24:33 | INFO    |   CONFIG | staging_dir=/demo/run-42/staging  (2 linux upload destination)
+21:24:33 | INFO    |   CONFIG | results_dir=/demo/run-42/results  (3 linux logs/results (separate from upload))
+21:24:33 | INFO    |   CONFIG | retrieve_to=/demo/run-42/retrieved  (4 local retrieve destination)
+21:24:33 | INFO    | INITIALIZATION | 2 file(s) to upload  local_source=/demo/run-42/source  linux_upload=/demo/run-42/staging
+21:24:33 | INFO    | FILE       | meta.txt  size=8  checksum=1afd1b403a9a…
+21:24:33 | INFO    | FILE       | payload.txt  size=15  checksum=14274f8239b5…
+21:24:33 | INFO    | DRY-RUN    | no files will be written
+21:24:33 | INFO    | TRANSFER   | would → /demo/run-42/staging/meta.txt
+21:24:33 | INFO    | TRANSFER   | would → /demo/run-42/staging/payload.txt
+21:24:33 | INFO    | SUMMARY    | OK  2/2 files would be staged (dry-run)
+21:24:33 | INFO    | NEXT       | All 2 file(s) would be staged (dry-run). Safe to continue.
