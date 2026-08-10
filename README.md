@@ -11,7 +11,16 @@ The config names four folders:
 | `results_dir` | Linux folder for log/result data (must differ from `staging_dir`) |
 | `retrieve_to` | Local folder where retrieved logs/results are saved |
 
-Built for lab operators: each step prints plain status (`INITIALIZATION` → `TRANSFER` → `VERIFY` → `SUCCESS` / `FAIL` → `SUMMARY` → `NEXT`) so you always know what happened and what to do next. No GUI, no daemon — one small Python CLI.
+Built for lab operators: each step prints plain status (`INITIALIZATION` → `TRANSFER` → `VERIFY` → `SUCCESS` / `FAIL` → `SUMMARY` → `NEXT`) so you always know what happened and what to do next.
+
+**Public web demo (Vercel):** sample-log replay for off-machine review — see [DEMO.md](DEMO.md).  
+**Local operator UI:** `pip install -e ".[web]"` then `python -m verified_xfer.web.app` → http://127.0.0.1:8765
+
+## Screenshots
+
+![Local FastAPI web UI after a dry-run stage](docs/demo/web-ui-stage.png)
+
+![Public Vercel demo replaying IxDF status lines](docs/demo/vercel-demo-replay.png)
 
 ## CLI session capture
 

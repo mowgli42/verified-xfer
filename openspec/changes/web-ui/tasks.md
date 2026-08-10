@@ -6,3 +6,5 @@
 4. DEMO.md + sample logs — done
 5. Gherkin web scenarios (Validated) — done
 6. Beads for production rebuild — done
+7. Vercel public demo (`demo/` replay) + screenshots — done
+8. `/api/health` on Vercel — done

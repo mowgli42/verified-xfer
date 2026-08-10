@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>verified-xfer — demo</title>
+  <meta name="description" content="Verified stage + retrieve of test files between Windows and Linux shares. Interactive IxDF status demo." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #14201c;
+      --paper: #e8f0ea;
+      --panel: #f4faf5;
+      --line: #b7c9bb;
+      --moss: #1f6b4a;
+      --moss-deep: #0f3d2b;
+      --signal: #c45c26;
+      --ok: #1b7a45;
+      --fail: #b3261e;
+      --muted: #5a6d62;
+      --log-bg: #101a16;
+      --log-fg: #d7e6dc;
+      --serif: "Source Serif 4", Georgia, serif;
+      --sans: "IBM Plex Sans", system-ui, sans-serif;
+      --mono: "IBM Plex Mono", ui-monospace, monospace;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: var(--sans);
+      background:
+        radial-gradient(ellipse 80% 50% at 10% -10%, #cfe8d8 0%, transparent 55%),
+        radial-gradient(ellipse 60% 40% at 100% 0%, #f0e0d2 0%, transparent 45%),
+        linear-gradient(180deg, var(--paper), #dfe9e2 100%);
+    }
+    .banner {
+      background: var(--moss-deep);
+      color: #e7f5ec;
+      font-size: 0.85rem;
+      padding: 0.55rem 1.25rem;
+      text-align: center;
+    }
+    .banner strong { color: #9ee0b8; font-weight: 600; }
+    header.hero {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 1.25rem;
+    }
+    .brand {
+      font-family: var(--serif);
+      font-size: clamp(2.4rem, 5vw, 3.4rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin: 0 0 0.5rem;
+      color: var(--moss-deep);
+      line-height: 1.05;
+    }
+    .lede {
+      max-width: 38rem;
+      margin: 0;
+      font-size: 1.1rem;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 1.35rem;
+    }
+    .cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.65rem 1rem;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+      border: 1px solid transparent;
+    }
+    .cta.primary { background: var(--moss); color: #fff; }
+    .cta.ghost { background: transparent; color: var(--moss-deep); border-color: var(--line); }
+    main {
+      max-width: 1100px;
+      margin: 0 auto 3rem;
+      padding: 0 1.5rem;
+      display: grid;
+      gap: 1.25rem;
+    }
+    .console {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      min-height: 420px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      overflow: hidden;
+      background: var(--panel);
+      box-shadow: 0 18px 40px rgba(15, 61, 43, 0.08);
+    }
+    @media (max-width: 800px) {
+      .console { grid-template-columns: 1fr; }
+    }
+    aside {
+      padding: 1.25rem;
+      border-right: 1px solid var(--line);
+      background: #eef6f0;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    label.field-label {
+      display: block;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--muted);
+      margin-bottom: 0.35rem;
+    }
+    select {
+      width: 100%;
+      padding: 0.55rem 0.65rem;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+    }
+    .checks { display: flex; flex-direction: column; gap: 0.55rem; }
+    .checks label {
+      display: flex; gap: 0.45rem; align-items: center;
+      font-size: 0.92rem; cursor: pointer;
+    }
+    .actions { margin-top: auto; display: flex; flex-direction: column; gap: 0.5rem; }
+    button {
+      padding: 0.7rem 0.9rem;
+      border-radius: 4px;
+      border: 1px solid transparent;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button:disabled { opacity: 0.45; cursor: not-allowed; }
+    button.primary { background: var(--moss); color: #fff; }
+    button.ghost { background: transparent; border-color: var(--line); color: var(--moss-deep); }
+    .log-panel {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      background: var(--log-bg);
+      color: var(--log-fg);
+    }
+    .log-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #24352c;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: #8aa396;
+    }
+    #status-pill {
+      text-transform: none;
+      letter-spacing: 0;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      background: #24352c;
+      color: #8aa396;
+    }
+    #status-pill.running { background: #1e3a5f; color: #7ec8ff; }
+    #status-pill.ok { background: #143d2a; color: #6ddea0; }
+    #status-pill.fail { background: #3d1a1e; color: #f07178; }
+    #log {
+      flex: 1;
+      margin: 0;
+      padding: 1rem;
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      line-height: 1.55;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      min-height: 320px;
+    }
+    #log .line-fail { color: #f07178; }
+    #log .line-ok { color: #6ddea0; }
+    #log .line-next { color: #ffcc66; }
+    #log .line-init { color: #7ec8ff; }
+    .folders {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.75rem;
+    }
+    @media (max-width: 800px) {
+      .folders { grid-template-columns: 1fr 1fr; }
+    }
+    .folder-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 0.9rem 1rem;
+      background: rgba(255,255,255,0.55);
+    }
+    .folder-card h3 {
+      margin: 0 0 0.25rem;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--moss);
+    }
+    .folder-card p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--ink);
+      line-height: 1.35;
+    }
+    .shots {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    @media (max-width: 800px) {
+      .shots { grid-template-columns: 1fr; }
+    }
+    figure {
+      margin: 0;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      overflow: hidden;
+      background: #fff;
+    }
+    figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      background: #111;
+    }
+    figcaption {
+      padding: 0.65rem 0.9rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+    }
+    footer {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 1.5rem 2.5rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    footer a { color: var(--moss); }
+    h2.section {
+      font-family: var(--serif);
+      font-size: 1.45rem;
+      margin: 0.5rem 0 0.25rem;
+      color: var(--moss-deep);
+    }
+  </style>
+</head>
+<body>
+  <div class="banner">
+    <strong>Public demo</strong> — replays real sample logs. Live folder transfers run via the local CLI or FastAPI UI on your machine.
+  </div>
+
+  <header class="hero">
+    <h1 class="brand">verified-xfer</h1>
+    <p class="lede">
+      Upload test files from a local folder to a Linux folder, then pull logs from a
+      separate Linux folder — with a visible check on every file.
+    </p>
+    <div class="cta-row">
+      <a class="cta primary" href="#console">Try the live log demo</a>
+      <a class="cta ghost" href="https://github.com/mowgli42/verified-xfer">GitHub</a>
+    </div>
+  </header>
+
+  <main>
+    <h2 class="section">Four folders</h2>
+    <div class="folders" aria-label="Four required folders">
+      <div class="folder-card"><h3>1 · source_dir</h3><p>Local upload source</p></div>
+      <div class="folder-card"><h3>2 · staging_dir</h3><p>Linux upload destination</p></div>
+      <div class="folder-card"><h3>3 · results_dir</h3><p>Linux logs (separate)</p></div>
+      <div class="folder-card"><h3>4 · retrieve_to</h3><p>Local retrieve destination</p></div>
+    </div>
+
+    <h2 class="section" id="console">Operator console (demo replay)</h2>
+    <div class="console">
+      <aside>
+        <div>
+          <label class="field-label" for="command">Action</label>
+          <select id="command">
+            <option value="stage-dry">Stage · dry-run</option>
+            <option value="stage">Stage · verified upload</option>
+            <option value="retrieve">Retrieve · results &amp; logs</option>
+          </select>
+        </div>
+        <div class="checks">
+          <label><input type="checkbox" id="autoplay" checked /> Auto-scroll log</label>
+        </div>
+        <div class="actions">
+          <button class="primary" id="run-btn" type="button">Run demo</button>
+          <button class="ghost" id="clear-btn" type="button">Clear log</button>
+        </div>
+      </aside>
+      <section class="log-panel">
+        <div class="log-header">
+          <span>IxDF status stream</span>
+          <span id="status-pill">idle</span>
+        </div>
+        <pre id="log" aria-live="polite"></pre>
+      </section>
+    </div>
+
+    <h2 class="section">Screenshots</h2>
+    <div class="shots">
+      <figure>
+        <img id="shot-web" src="/docs/demo/web-ui-stage.png" alt="Web UI after a stage run with live log" />
+        <figcaption>Local FastAPI web UI — stage with scrolling IxDF log</figcaption>
+      </figure>
+      <figure>
+        <img id="shot-demo" src="/docs/demo/vercel-demo-replay.png" alt="Public demo page replaying sample log lines" />
+        <figcaption>This Vercel demo — sample log replay for off-machine review</figcaption>
+      </figure>
+    </div>
+  </main>
+
+  <footer>
+    Graham-bell prototype: working CLI + local web UI; this site is the remote review surface.
+    Real NFS/SFTP transfers stay on the lab machine —
+    <a href="https://github.com/mowgli42/verified-xfer/blob/main/DEMO.md">DEMO.md</a>.
+  </footer>
+
+  <script src="./samples.js"></script>
+  <script>
+    const logEl = document.getElementById("log");
+    const pill = document.getElementById("status-pill");
+    const runBtn = document.getElementById("run-btn");
+    let running = false;
+    let timer = null;
+
+    function setPill(state, text) {
+      pill.className = state || "";
+      pill.textContent = text;
+    }
+
+    function appendLine(text) {
+      const span = document.createElement("span");
+      if (text.includes("FAIL")) span.className = "line-fail";
+      else if (text.includes("SUCCESS") || text.includes("VERIFY     | OK")) span.className = "line-ok";
+      else if (text.includes("NEXT") || text.includes("DRY-RUN")) span.className = "line-next";
+      else if (text.includes("INITIALIZATION") || text.includes("CONFIG")) span.className = "line-init";
+      span.textContent = text + "\n";
+      logEl.appendChild(span);
+      if (document.getElementById("autoplay").checked) {
+        logEl.scrollTop = logEl.scrollHeight;
+      }
+    }
+
+    document.getElementById("clear-btn").onclick = () => {
+      if (timer) { clearTimeout(timer); timer = null; }
+      logEl.textContent = "";
+      setPill("", "idle");
+      running = false;
+      runBtn.disabled = false;
+    };
+
+    function sleep(ms) {
+      return new Promise((resolve) => { timer = setTimeout(resolve, ms); });
+    }
+
+    runBtn.onclick = async () => {
+      if (running) return;
+      running = true;
+      runBtn.disabled = true;
+      logEl.textContent = "";
+      setPill("running", "running…");
+
+      const key = document.getElementById("command").value;
+      const lines = (window.VX_SAMPLES && window.VX_SAMPLES[key]) || [];
+      try {
+        for (const line of lines) {
+          appendLine(line);
+          await sleep(line.includes("TRANSFER") || line.includes("VERIFY") ? 220 : 90);
+        }
+        setPill("ok", "success");
+      } catch (err) {
+        appendLine("FAIL | " + err.message);
+        setPill("fail", "error");
+      } finally {
+        running = false;
+        runBtn.disabled = false;
+      }
+    };
+
+    // Prefer relative screenshot paths when served from demo/ or site root.
+    function fixShot(id, candidates) {
+      const img = document.getElementById(id);
+      let i = 0;
+      img.onerror = () => {
+        i += 1;
+        if (i < candidates.length) img.src = candidates[i];
+      };
+      img.src = candidates[0];
+    }
+    fixShot("shot-web", [
+      "./docs/demo/web-ui-stage.png",
+      "../docs/demo/web-ui-stage.png",
+      "/docs/demo/web-ui-stage.png",
+    ]);
+    fixShot("shot-demo", [
+      "./docs/demo/vercel-demo-replay.png",
+      "../docs/demo/vercel-demo-replay.png",
+      "/docs/demo/vercel-demo-replay.png",
+    ]);
+  </script>
+</body>
+</html>

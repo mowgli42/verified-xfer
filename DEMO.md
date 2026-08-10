@@ -1,12 +1,12 @@
-# DEMO — verified-xfer (graham-bell prototype)
+# DEMO — verified-xfer (graham-bell)
 
-Two surfaces, one core.
+Three surfaces, one core: **CLI** (lab), **local FastAPI UI** (lab), **Vercel static demo** (remote review).
 
 ## 1. CLI (primary operator path)
 
 ```bash
 pip install -e ".[sftp]"
-cp config.example.yaml config.yaml   # or use %PROGRAMDATA%\\verified-xfer\\config.yaml
+cp config.example.yaml config.yaml   # or use %PROGRAMDATA%\verified-xfer\config.yaml
 
 python -m verified_xfer stage --dry-run
 python -m verified_xfer stage
@@ -15,7 +15,7 @@ python -m verified_xfer retrieve
 
 Windows helpers: `examples/local-demo.ps1`, `examples/local-demo.bat`.
 
-Sample successful log: `docs/sample-logs/cli-stage-ok.txt`
+Sample successful logs: `docs/sample-logs/`
 
 ## 2. Local web UI (scrolling live log)
 
@@ -39,15 +39,25 @@ Or: `verified-xfer-web` after install.
 3. Watch INITIALIZATION → FILE → TRANSFER → SUMMARY stream into the log.
 4. Uncheck dry-run and run a real stage against a local backend folder.
 
-## Remote / low-attention review
+Screenshot: `docs/demo/web-ui-stage.png`
 
-Real SFTP/NFS cannot run on a static host. For off-machine review use:
+## 3. Vercel public demo (sample-log replay)
 
-- This `DEMO.md` + sample logs under `docs/sample-logs/`
-- CLI transcript in `docs/images/cli-demo.txt` (if present)
-- Screenshot the web UI after a dry-run and drop under `docs/demo/` when convenient
+Real SFTP/NFS cannot run on a static host. The Vercel site under `demo/` replays the same IxDF lines from `demo/samples.js` for remote / low-attention review.
 
-A production rebuild would host a job API + auth (see beads roadmap below).
+```bash
+# local preview of the static demo
+npx serve demo   # or: python -m http.server -d demo 4173
+
+# deploy (from repo root; needs Vercel auth)
+npx vercel --yes
+npx vercel --prod --yes
+```
+
+Health check: `GET /api/health` → `{ "status": "ok", "service": "verified-xfer-demo" }`
+
+Screenshot: `docs/demo/vercel-demo-replay.png`  
+Refresh screenshots: `NODE_PATH=~/node_modules node scripts/capture-demo-screenshots.mjs`
 
 ## Tests (no network)
 
@@ -60,8 +70,9 @@ pytest tests/ -q
 
 | Artifact | Location |
 |----------|----------|
-| Working demo | CLI + `http://127.0.0.1:8765` |
+| Working demo | CLI + `http://127.0.0.1:8765` + Vercel `demo/` |
 | Sample logs | `docs/sample-logs/` |
-| OpenSpec + Gherkin | `openspec/specs/file-staging/spec.md` (+ web scenarios) |
+| Screenshots | `docs/demo/*.png` |
+| OpenSpec + Gherkin | `openspec/specs/file-staging/spec.md` (+ web-ui change) |
 | Production beads | `BEADS.md` / `openspec/changes/web-ui/` |
 | Learnings | `LEARNINGS.md` |

@@ -15,6 +15,7 @@ retrieved/
 htmlcov/
 *.log
 .DS_Store
+public/
 
 # Beads / Dolt files (runtime — tracked: .beads/config.yaml, metadata.json, issues.jsonl, README.md)
 .dolt/

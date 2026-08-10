@@ -1,0 +1,19 @@
+21:24:33 | INFO    | INITIALIZATION | effective configuration — four folders
+21:24:33 | INFO    |   CONFIG | source=explicit --config
+21:24:33 | INFO    |   CONFIG | path=./config.yaml
+21:24:33 | INFO    |   CONFIG | backend=local
+21:24:33 | INFO    |   CONFIG | folders (upload: source_dir→staging_dir; retrieve: results_dir→retrieve_to)
+21:24:33 | INFO    |   CONFIG | source_dir=/demo/run-42/source  (1 local upload source)
+21:24:33 | INFO    |   CONFIG | staging_dir=/demo/run-42/staging  (2 linux upload destination)
+21:24:33 | INFO    |   CONFIG | results_dir=/demo/run-42/results  (3 linux logs/results (separate from upload))
+21:24:33 | INFO    |   CONFIG | retrieve_to=/demo/run-42/retrieved  (4 local retrieve destination)
+21:24:33 | INFO    | INITIALIZATION | listing linux logs/results folder  linux_logs=/demo/run-42/results
+21:24:33 | INFO    | INITIALIZATION | 2 file(s) to retrieve  linux_logs=/demo/run-42/results  local_retrieve=/demo/run-42/retrieved
+21:24:33 | INFO    | TRANSFER   | ← /demo/run-42/results/answer.txt
+21:24:33 | INFO    | VERIFY     | OK   size=3 checksum=084c799cd551…
+21:24:33 | INFO    | SUCCESS    | answer.txt saved to /demo/run-42/retrieved/answer.txt
+21:24:33 | INFO    | TRANSFER   | ← /demo/run-42/results/test.log
+21:24:33 | INFO    | VERIFY     | OK   size=5 checksum=c26de83abdc9…
+21:24:33 | INFO    | SUCCESS    | test.log saved to /demo/run-42/retrieved/test.log
+21:24:33 | INFO    | SUMMARY    | OK  2/2 files retrieved
+21:24:33 | INFO    | NEXT       | All 2 file(s) retrieved. Safe to continue.
