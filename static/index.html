@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>verified-xfer</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --surface: #1a2332;
+      --border: #2d3a4d;
+      --text: #e7ecf3;
+      --muted: #8b9bb4;
+      --accent: #3d9cf0;
+      --ok: #3dd68c;
+      --fail: #f07178;
+      --warn: #ffcc66;
+      --mono: "JetBrains Mono", "SF Mono", "Cascadia Code", Consolas, monospace;
+      --sans: "Segoe UI", system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      padding: 1.25rem 1.75rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+    header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 0;
+      min-height: 0;
+    }
+    @media (max-width: 720px) {
+      main { grid-template-columns: 1fr; }
+    }
+    aside {
+      padding: 1.5rem;
+      border-right: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+    label {
+      display: block;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 0.4rem;
+    }
+    .field { margin-bottom: 0.25rem; }
+    select, input[type="text"] {
+      width: 100%;
+      padding: 0.55rem 0.7rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 0.95rem;
+    }
+    .checks {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+    .checks label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-transform: none;
+      letter-spacing: 0;
+      font-size: 0.9rem;
+      color: var(--text);
+      cursor: pointer;
+    }
+    .checks input { width: auto; accent-color: var(--accent); }
+    .actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      margin-top: auto;
+    }
+    button {
+      padding: 0.7rem 1rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    button:disabled { opacity: 0.45; cursor: not-allowed; }
+    button.primary {
+      background: var(--accent);
+      color: #061018;
+    }
+    button.ghost {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+    section.log-panel {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      padding: 1rem 1.25rem 1.25rem;
+    }
+    .log-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.6rem;
+    }
+    .log-header span {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+    }
+    #status-pill {
+      font-size: 0.75rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      background: var(--border);
+      color: var(--muted);
+    }
+    #status-pill.running { background: #1e3a5f; color: var(--accent); }
+    #status-pill.ok { background: #143d2a; color: var(--ok); }
+    #status-pill.fail { background: #3d1a1e; color: var(--fail); }
+    #log {
+      flex: 1;
+      margin: 0;
+      padding: 1rem;
+      background: #0a0e14;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      line-height: 1.55;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+      min-height: 320px;
+      color: #c5d0e0;
+    }
+    #log .line-fail { color: var(--fail); }
+    #log .line-ok { color: var(--ok); }
+    #log .line-next { color: var(--warn); }
+    #log .line-init { color: var(--accent); }
+    footer {
+      padding: 0.6rem 1.75rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>verified-xfer</h1>
+    <p>Stage files to Linux share · retrieve results &amp; logs · verified</p>
+  </header>
+
+  <main>
+    <aside>
+      <div class="field">
+        <label for="command">Action</label>
+        <select id="command">
+          <option value="stage">Stage (upload to Linux)</option>
+          <option value="retrieve">Retrieve (download results)</option>
+        </select>
+      </div>
+
+      <div class="checks">
+        <label><input type="checkbox" id="dry_run" /> Dry-run (no writes)</label>
+        <label><input type="checkbox" id="force" /> Force overwrite on stage</label>
+      </div>
+
+      <div class="field">
+        <label for="config_path">Config path (optional)</label>
+        <input type="text" id="config_path" placeholder="uses search order if empty" />
+      </div>
+
+      <div class="actions">
+        <button class="primary" id="run-btn" type="button">Run</button>
+        <button class="ghost" id="clear-btn" type="button">Clear log</button>
+      </div>
+    </aside>
+
+    <section class="log-panel">
+      <div class="log-header">
+        <span>Live log</span>
+        <span id="status-pill">idle</span>
+      </div>
+      <pre id="log" aria-live="polite"></pre>
+    </section>
+  </main>
+
+  <footer>
+    Local FastAPI prototype · config search: cwd → user → %PROGRAMDATA% ·
+    <a href="https://github.com/mowgli42/verified-xfer">repo</a>
+  </footer>
+
+  <script>
+    const logEl = document.getElementById("log");
+    const pill = document.getElementById("status-pill");
+    const runBtn = document.getElementById("run-btn");
+    let running = false;
+
+    function setPill(state, text) {
+      pill.className = state || "";
+      pill.textContent = text;
+    }
+
+    function appendLine(text) {
+      const span = document.createElement("span");
+      if (text.includes("FAIL")) span.className = "line-fail";
+      else if (text.includes("SUCCESS") || text.includes("VERIFY     | OK")) span.className = "line-ok";
+      else if (text.includes("NEXT")) span.className = "line-next";
+      else if (text.includes("INITIALIZATION") || text.includes("CONFIG")) span.className = "line-init";
+      span.textContent = text + "\n";
+      logEl.appendChild(span);
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    document.getElementById("clear-btn").onclick = () => {
+      logEl.textContent = "";
+      setPill("", "idle");
+    };
+
+    runBtn.onclick = async () => {
+      if (running) return;
+      running = true;
+      runBtn.disabled = true;
+      setPill("running", "running…");
+      logEl.textContent = "";
+
+      const body = {
+        command: document.getElementById("command").value,
+        dry_run: document.getElementById("dry_run").checked,
+        force: document.getElementById("force").checked,
+        config_path: document.getElementById("config_path").value.trim() || null,
+      };
+
+      try {
+        const res = await fetch("/api/run", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Accept": "text/event-stream" },
+          body: JSON.stringify(body),
+        });
+        if (!res.ok) {
+          appendLine("FAIL | HTTP " + res.status);
+          setPill("fail", "error");
+          return;
+        }
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
+        let finalRc = null;
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const parts = buffer.split("\n\n");
+          buffer = parts.pop() || "";
+          for (const part of parts) {
+            const line = part.trim();
+            if (!line.startsWith("data:")) continue;
+            const payload = JSON.parse(line.slice(5).trim());
+            if (payload.type === "line") appendLine(payload.text);
+            if (payload.type === "done") finalRc = payload.rc;
+          }
+        }
+
+        if (finalRc === 0) setPill("ok", "success");
+        else if (finalRc === null) setPill("fail", "ended");
+        else setPill("fail", "failed");
+      } catch (err) {
+        appendLine("FAIL | " + err.message + "  → is the FastAPI server running?");
+        setPill("fail", "error");
+      } finally {
+        running = false;
+        runBtn.disabled = false;
+      }
+    };
+  </script>
+</body>
+</html>
