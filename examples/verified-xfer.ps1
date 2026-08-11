@@ -1,11 +1,12 @@
 #requires -Version 5.1
 <#
 .SYNOPSIS
-  Windows PowerShell wrapper for verified-xfer (stage / retrieve).
+  Windows PowerShell wrapper for verified-xfer.
 
 .EXAMPLE
-  .\verified-xfer.ps1 stage --dry-run
-  .\verified-xfer.ps1 retrieve -c D:\lab\config.yaml
+  .\verified-xfer.ps1                 # interactive menu
+  .\verified-xfer.ps1 web             # browser UI
+  .\verified-xfer.ps1 stage --dry-run # one-shot
 #>
 $ErrorActionPreference = 'Stop'
 

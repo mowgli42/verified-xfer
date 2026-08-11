@@ -92,8 +92,19 @@ Every important step SHALL announce status so a non-technical operator never has
 - **WHEN** they are the same path
 - **THEN** the tool exits non-zero with a clear FAIL hint
 
-#### Scenario: Passwords redacted
+#### Scenario: Interactive menu with default config
 
-- **GIVEN** an SFTP config that includes a password
-- **WHEN** the effective config is printed
-- **THEN** the password value is not shown in clear text
+- **GIVEN** a valid config is found via the normal search order
+- **WHEN** the operator runs `verified-xfer` with no subcommand
+- **THEN** the tool prints the effective four folders
+- **AND** offers Stage / Retrieve / Quit
+- **WHEN** the operator chooses Stage and presses Enter
+- **THEN** the scrolling status stream shows INITIALIZATION through SUMMARY
+
+#### Scenario: Web UI loads default config
+
+- **GIVEN** a valid config is found
+- **WHEN** the operator opens the local web UI
+- **THEN** the page shows config ready without typing a path
+- **AND** selecting Stage and clicking Run streams the same IxDF lines into the live log
+

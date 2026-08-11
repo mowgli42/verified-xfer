@@ -42,11 +42,17 @@
       font-weight: 600;
       letter-spacing: -0.02em;
     }
-    header p {
-      margin: 0;
+    header p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    #ready-banner {
+      margin-left: auto;
+      font-size: 0.8rem;
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+      background: var(--border);
       color: var(--muted);
-      font-size: 0.9rem;
     }
+    #ready-banner.ok { background: #143d2a; color: var(--ok); }
+    #ready-banner.bad { background: #3d1a1e; color: var(--fail); }
     main {
       flex: 1;
       display: grid;
@@ -63,7 +69,7 @@
       background: var(--surface);
       display: flex;
       flex-direction: column;
-      gap: 1.25rem;
+      gap: 1.1rem;
     }
     label {
       display: block;
@@ -73,20 +79,36 @@
       color: var(--muted);
       margin-bottom: 0.4rem;
     }
-    .field { margin-bottom: 0.25rem; }
-    select, input[type="text"] {
+    select {
       width: 100%;
-      padding: 0.55rem 0.7rem;
+      padding: 0.7rem 0.75rem;
       background: var(--bg);
       border: 1px solid var(--border);
       border-radius: 6px;
       color: var(--text);
-      font-size: 0.95rem;
+      font-size: 1rem;
+    }
+    .hint {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.4;
+      margin: 0;
+    }
+    details.advanced {
+      border-top: 1px solid var(--border);
+      padding-top: 0.85rem;
+    }
+    details.advanced summary {
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-bottom: 0.75rem;
     }
     .checks {
       display: flex;
       flex-direction: column;
-      gap: 0.6rem;
+      gap: 0.55rem;
+      margin-bottom: 0.75rem;
     }
     .checks label {
       display: flex;
@@ -97,8 +119,18 @@
       font-size: 0.9rem;
       color: var(--text);
       cursor: pointer;
+      margin: 0;
     }
     .checks input { width: auto; accent-color: var(--accent); }
+    input[type="text"] {
+      width: 100%;
+      padding: 0.55rem 0.7rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 0.9rem;
+    }
     .actions {
       display: flex;
       flex-direction: column;
@@ -106,19 +138,15 @@
       margin-top: auto;
     }
     button {
-      padding: 0.7rem 1rem;
+      padding: 0.85rem 1rem;
       border: none;
       border-radius: 6px;
-      font-size: 0.95rem;
+      font-size: 1rem;
       font-weight: 600;
       cursor: pointer;
-      transition: opacity 0.15s;
     }
     button:disabled { opacity: 0.45; cursor: not-allowed; }
-    button.primary {
-      background: var(--accent);
-      color: #061018;
-    }
+    button.primary { background: var(--accent); color: #061018; }
     button.ghost {
       background: transparent;
       color: var(--muted);
@@ -184,28 +212,30 @@
 <body>
   <header>
     <h1>verified-xfer</h1>
-    <p>Stage files to Linux share · retrieve results &amp; logs · verified</p>
+    <p>Select an action → Run → watch the live log</p>
+    <span id="ready-banner">checking config…</span>
   </header>
 
   <main>
     <aside>
-      <div class="field">
+      <div>
         <label for="command">Action</label>
         <select id="command">
-          <option value="stage">Stage (upload to Linux)</option>
-          <option value="retrieve">Retrieve (download results)</option>
+          <option value="stage">1 · Stage (upload to Linux)</option>
+          <option value="retrieve">2 · Retrieve (download results)</option>
         </select>
       </div>
+      <p class="hint" id="config-hint">Loads your default config automatically (cwd → user → system-wide).</p>
 
-      <div class="checks">
-        <label><input type="checkbox" id="dry_run" /> Dry-run (no writes)</label>
-        <label><input type="checkbox" id="force" /> Force overwrite on stage</label>
-      </div>
-
-      <div class="field">
-        <label for="config_path">Config path (optional)</label>
-        <input type="text" id="config_path" placeholder="uses search order if empty" />
-      </div>
+      <details class="advanced">
+        <summary>Advanced options</summary>
+        <div class="checks">
+          <label><input type="checkbox" id="dry_run" /> Dry-run (no writes)</label>
+          <label><input type="checkbox" id="force" /> Force overwrite on stage</label>
+        </div>
+        <label for="config_path">Override config path</label>
+        <input type="text" id="config_path" placeholder="leave empty to use default" />
+      </details>
 
       <div class="actions">
         <button class="primary" id="run-btn" type="button">Run</button>
@@ -223,7 +253,7 @@
   </main>
 
   <footer>
-    Local FastAPI prototype · config search: cwd → user → %PROGRAMDATA% ·
+    Tip: from a terminal with config present, just run <code>verified-xfer</code> for the same menu ·
     <a href="https://github.com/mowgli42/verified-xfer">repo</a>
   </footer>
 
@@ -231,6 +261,8 @@
     const logEl = document.getElementById("log");
     const pill = document.getElementById("status-pill");
     const runBtn = document.getElementById("run-btn");
+    const readyBanner = document.getElementById("ready-banner");
+    const configHint = document.getElementById("config-hint");
     let running = false;
 
     function setPill(state, text) {
@@ -249,9 +281,40 @@
       logEl.scrollTop = logEl.scrollHeight;
     }
 
+    async function refreshReady() {
+      try {
+        const res = await fetch("/api/ready");
+        const data = await res.json();
+        if (data.ok) {
+          readyBanner.className = "ok";
+          readyBanner.textContent = "config ready";
+          configHint.textContent = "Using " + (data.path || "default config") + ". Pick Stage or Retrieve, then Run.";
+          logEl.textContent = "";
+          appendLine("INITIALIZATION | config ready — four folders");
+          for (const line of data.lines || []) appendLine("  CONFIG | " + line);
+          appendLine("NEXT       | Select an action and click Run.");
+          setPill("", "ready");
+          runBtn.disabled = false;
+        } else {
+          readyBanner.className = "bad";
+          readyBanner.textContent = "config missing";
+          configHint.textContent = data.error || "No config found.";
+          appendLine("FAIL | " + (data.error || "no config") + "  → copy config.example.yaml to ./config.yaml");
+          setPill("fail", "need config");
+          runBtn.disabled = true;
+        }
+      } catch (err) {
+        readyBanner.className = "bad";
+        readyBanner.textContent = "offline";
+        appendLine("FAIL | " + err.message);
+        runBtn.disabled = true;
+      }
+    }
+
     document.getElementById("clear-btn").onclick = () => {
       logEl.textContent = "";
       setPill("", "idle");
+      refreshReady();
     };
 
     runBtn.onclick = async () => {
@@ -303,13 +366,20 @@
         else if (finalRc === null) setPill("fail", "ended");
         else setPill("fail", "failed");
       } catch (err) {
-        appendLine("FAIL | " + err.message + "  → is the FastAPI server running?");
+        appendLine("FAIL | " + err.message + "  → is the server running?");
         setPill("fail", "error");
       } finally {
         running = false;
         runBtn.disabled = false;
       }
     };
+
+    // Enter key runs when focus is on the action select
+    document.getElementById("command").addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !running && !runBtn.disabled) runBtn.click();
+    });
+
+    refreshReady();
   </script>
 </body>
 </html>
