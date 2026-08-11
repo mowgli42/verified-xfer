@@ -1,9 +1,11 @@
 @echo off
 setlocal EnableExtensions
-REM Windows batch wrapper for verified-xfer (stage / retrieve).
-REM Examples:
-REM   verified-xfer.bat stage --dry-run
+REM Windows wrapper — interactive by default when config exists.
+REM   verified-xfer.bat              → menu (1 Stage / 2 Retrieve)
+REM   verified-xfer.bat web          → browser UI
+REM   verified-xfer.bat stage        → one-shot upload
 REM   verified-xfer.bat retrieve -c D:\lab\config.yaml
+
 
 set PYTHONUNBUFFERED=1
 

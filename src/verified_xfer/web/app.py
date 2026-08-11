@@ -1,10 +1,8 @@
-"""FastAPI local web UI with live scrolling log.
+"""FastAPI local web UI — select action, Run, watch scrolling log.
 
 Graham-bell trade-off:
   Chose SSE streaming of status lines over a job queue + WebSocket.
-  Alternative: Redis/RQ + WebSocket for multi-user job history.
-  Reason: zero extra deps, one process, demo works in <2 minutes.
-  Revisit when: concurrent operators or durable job history → production bead.
+  Default path loads system/cwd config automatically (no path typing).
 """
 
 from __future__ import annotations
@@ -16,12 +14,12 @@ import threading
 from pathlib import Path
 from typing import Any, AsyncIterator
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from verified_xfer.config import format_config_summary, load_config
+from verified_xfer.config import format_config_summary, load_config, validate_folders
 from verified_xfer.core import retrieve, stage
 from verified_xfer.ixdf_log import Status, setup_logging
 
@@ -39,8 +37,24 @@ class RunRequest(BaseModel):
     config_path: str | None = None
 
 
+def _config_snapshot(config_path: str | None = None) -> dict[str, Any]:
+    cfg, cfg_path, source_label = load_config(config_path)
+    if not cfg:
+        return {"ok": False, "error": "no config file found", "path": None, "lines": []}
+    err = validate_folders(cfg)
+    if err:
+        return {"ok": False, "error": err, "path": str(cfg_path), "lines": []}
+    lines = format_config_summary(cfg, cfg_path, source_label)
+    return {
+        "ok": True,
+        "error": None,
+        "path": str(cfg_path),
+        "source": source_label,
+        "lines": lines,
+    }
+
+
 def _run_transfer(req: RunRequest, line_q: queue.Queue) -> int:
-    """Blocking worker: runs stage/retrieve and pushes each status line into line_q."""
     log = setup_logging(verbose=False)
 
     def on_line(msg: str) -> None:
@@ -52,19 +66,18 @@ def _run_transfer(req: RunRequest, line_q: queue.Queue) -> int:
     if not cfg:
         status.fail(
             "no config file found",
-            "copy config.example.yaml or set system-wide config — see TROUBLESHOOTING.md",
+            "copy config.example.yaml to ./config.yaml — see TROUBLESHOOTING.md",
         )
         line_q.put({"type": "done", "rc": 1})
         return 1
 
-    status.initialization("effective configuration")
+    status.initialization("config ready — four folders")
     for line in format_config_summary(cfg, cfg_path, source_label):
         status.info(f"  CONFIG | {line}")
 
-    required = ["source_dir", "staging_dir", "results_dir", "retrieve_to"]
-    missing = [k for k in required if k not in cfg]
-    if missing:
-        status.fail(f"config missing keys: {missing}", "see config.example.yaml")
+    folder_err = validate_folders(cfg)
+    if folder_err:
+        status.fail(folder_err, "fix config.example.yaml four-folder section")
         line_q.put({"type": "done", "rc": 1})
         return 1
 
@@ -78,7 +91,6 @@ def _run_transfer(req: RunRequest, line_q: queue.Queue) -> int:
 
 
 async def _sse_stream(req: RunRequest) -> AsyncIterator[str]:
-    """Yield SSE events while a background thread runs the transfer."""
     line_q: queue.Queue = queue.Queue()
     thread = threading.Thread(target=_run_transfer, args=(req, line_q), daemon=True)
     thread.start()
@@ -119,6 +131,12 @@ async def index() -> HTMLResponse:
     )
 
 
+@app.get("/api/ready")
+async def ready() -> dict[str, Any]:
+    """Startup check: is the default config present and valid?"""
+    return _config_snapshot(None)
+
+
 @app.post("/api/run")
 async def run_transfer(req: RunRequest) -> StreamingResponse:
     return StreamingResponse(
@@ -138,15 +156,9 @@ async def health() -> dict[str, str]:
 
 
 def main() -> None:
-    import uvicorn
+    from verified_xfer.cli import launch_web
 
-    uvicorn.run(
-        "verified_xfer.web.app:app",
-        host="127.0.0.1",
-        port=8765,
-        reload=False,
-        log_level="info",
-    )
+    raise SystemExit(launch_web())
 
 
 if __name__ == "__main__":

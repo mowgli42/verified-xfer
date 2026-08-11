@@ -8,6 +8,7 @@ This repo follows **OpenSpec (behaviour-driven) → Beads → Ponytail code**, w
 4. Obey `.cursor/rules/ixdf-operator-feedback.mdc` — status lines stay loud and plain; every FAIL has a `→` next step. See `DESIGN.md`.
 5. Do not silence `INITIALIZATION` / `CONFIG` / `TRANSFER` / `VERIFY` / `SUCCESS` / `SUMMARY` / `NEXT`.
 6. Config always names four folders: local `source_dir` → linux `staging_dir` (upload); linux `results_dir` (logs, separate) → local `retrieve_to`.
+7. Default UX is interactive: `verified-xfer` (no args) or `verified-xfer web` — select action → run → scrolling log. Keep one-shot `stage`/`retrieve` for scripts.
 
 When adding behaviour: update Gherkin first, then Beads, then code.
 

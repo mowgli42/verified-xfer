@@ -13,8 +13,8 @@ The config names four folders:
 
 Built for lab operators: each step prints plain status (`INITIALIZATION` → `TRANSFER` → `VERIFY` → `SUCCESS` / `FAIL` → `SUMMARY` → `NEXT`) so you always know what happened and what to do next.
 
-**Public web demo (Vercel):** sample-log replay for off-machine review — see [DEMO.md](DEMO.md).  
-**Local operator UI:** `pip install -e ".[web]"` then `python -m verified_xfer.web.app` → http://127.0.0.1:8765
+**Public web demo (Vercel):** sample-log replay — see [DEMO.md](DEMO.md).  
+**Day-to-day use:** `verified-xfer` (menu) or `verified-xfer web` (browser).
 
 ## Screenshots
 
@@ -97,50 +97,42 @@ See [BEADS.md](BEADS.md), [openspec/specs/file-staging/spec.md](openspec/specs/f
 
 ## Quick start
 
-### Windows (PowerShell or Command Prompt)
-
-```powershell
-pip install -e ".[sftp]"   # or: pip install -e .
-
-copy config.example.yaml config.yaml
-# edit the four folder paths in config.yaml
-
-# Wrapper (finds py/python automatically; unbuffered status lines)
-.\examples\verified-xfer.ps1 stage --show-config-paths
-.\examples\verified-xfer.ps1 stage --dry-run
-.\examples\verified-xfer.ps1 stage
-# … run your external test …
-.\examples\verified-xfer.ps1 retrieve
-
-# Same via cmd.exe:
-examples\verified-xfer.bat stage --dry-run
-
-# Local four-folder demo (no real share needed):
-.\examples\local-demo.ps1
-examples\local-demo.bat
-```
-
-### Linux / macOS
+With a default `config.yaml` in place (cwd, user, or `%PROGRAMDATA%\verified-xfer\`):
 
 ```bash
-pip install -e ".[sftp]"   # or: pip install -e .   (local/NFS only)
-
-# Option A – config in the current folder
+pip install -e ".[web]"          # once; add ,[sftp] if you need SFTP
 cp config.example.yaml config.yaml
-# edit the four folder paths
+# edit the four folder paths once
 
-python -m verified_xfer stage --show-config-paths   # where we look
-python -m verified_xfer stage --dry-run             # practice, no writes
-python -m verified_xfer stage                       # copy + check inputs
-# … run your external test …
-python -m verified_xfer retrieve                    # pull results + logs
-
-bash examples/local-demo.sh
+verified-xfer                    # interactive: pick 1 Stage / 2 Retrieve → Enter
+verified-xfer web                # same flow in the browser at http://127.0.0.1:8765
 ```
 
-Lab-wide Windows config (admin once): copy `config.example.yaml` to `%PROGRAMDATA%\verified-xfer\config.yaml`.
+**That’s the whole operator loop:** start → select action → Enter/Run → watch the scrolling status log.
 
-If a terminal buffers output: `python -u -m verified_xfer …` (the `.bat` / `.ps1` wrappers already set `PYTHONUNBUFFERED=1`).
+One-shot (scripts / automation) still works:
+
+```bash
+verified-xfer stage
+verified-xfer retrieve
+verified-xfer stage --dry-run
+```
+
+### Windows
+
+```bat
+examples\verified-xfer.bat
+examples\verified-xfer.bat web
+```
+
+```powershell
+.\examples\verified-xfer.ps1
+.\examples\verified-xfer.ps1 web
+```
+
+Local four-folder practice (no real share): `examples\local-demo.bat` / `.ps1` / `.sh`.
+
+If a terminal buffers output: wrappers set `PYTHONUNBUFFERED=1`; otherwise `python -u -m verified_xfer`.
 
 ## Config search order
 

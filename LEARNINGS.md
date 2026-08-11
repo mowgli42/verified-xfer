@@ -27,12 +27,13 @@
 - Static path resolution depends on running from the editable install / repo layout.  
 - **Vercel cannot run real transfers** — chose a static sample-log replay (`demo/`) instead of pretending serverless can mount NFS. Trade-off documented in DEMO.md.
 
-## Vercel slice
+## Simplified operator loop
 
-- Tried: ship FastAPI to Vercel serverless.  
-- **Chose:** static `demo/` + `api/health.js` + replay of `docs/sample-logs` lines.  
-- Why: graham-bell remote review needs screenshots + clickable status stream without lab shares.  
-- Failure avoided: a broken “Run” button that 500s on every Vercel invoke.
+- Tried: documenting many one-shot CLI flags as the primary path.  
+- **Chose:** default `verified-xfer` interactive menu + `verified-xfer web` with auto-loaded config.  
+- Why: lab users are not very technical; “start → pick action → Run → watch log” matches IxDF recognition over recall.  
+- Kept: `stage` / `retrieve` subcommands for scripts.
+
 
 ## Validated by this slice
 
