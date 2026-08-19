@@ -80,4 +80,6 @@ Dependencies are expressed so `bd ready` yields a safe sequence.
 | 11 | Done (this pass) | `openspec/specs/file-staging/spec.md`, README health UX order, design.md, BEADS.md |
 | 12 | Done (this pass) | `DESIGN.md`, `ixdf-operator-feedback.mdc`, NEXT lines + softened FAIL copy |
 
+SFTP automated coverage: `tests/test_sftp_backend.py` (mocked paramiko; no live host).
+
 Beads epic: `vx-0t0` (`bd ready` / `BEADS.md`).

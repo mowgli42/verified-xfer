@@ -30,3 +30,4 @@ public/
 .beads/last-touched
 .beads/*.lock
 .beads/daemon.*
+.beads/proxieddb/

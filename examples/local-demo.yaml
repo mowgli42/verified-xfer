@@ -1,0 +1,11 @@
+# verified-xfer local demo config
+#
+# Used by examples/local-demo.sh — paths are overridden at runtime via a temp dir.
+# Copy this as a template; replace the placeholder paths with your own.
+
+backend: local
+
+source_dir: /tmp/verified-xfer-demo/source
+staging_dir: /tmp/verified-xfer-demo/staging
+results_dir: /tmp/verified-xfer-demo/results
+retrieve_to: /tmp/verified-xfer-demo/retrieved
