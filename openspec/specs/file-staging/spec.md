@@ -108,3 +108,21 @@ Every important step SHALL announce status so a non-technical operator never has
 - **THEN** the page shows config ready without typing a path
 - **AND** selecting Stage and clicking Run streams the same IxDF lines into the live log
 
+### Requirement: SFTP backend
+
+The optional `sftp` backend SHALL implement the same put/get/list/size/hash contract as `local`, using paramiko. Automated tests MAY mock the SFTP session (no live host required). Missing paramiko SHALL fail with an install hint.
+
+#### Scenario: Mocked SFTP put/get verifies size and SHA-256
+
+- **GIVEN** an SFTP backend with a mocked paramiko session
+- **WHEN** a file is put to a remote staging path
+- **THEN** get returns the same bytes
+- **AND** size and SHA-256 match the source
+- **AND** list_files names that file
+
+#### Scenario: SFTP without paramiko
+
+- **GIVEN** paramiko is not installed
+- **WHEN** the operator selects `backend: sftp`
+- **THEN** the tool exits with a message to `pip install 'verified-xfer[sftp]'`
+
