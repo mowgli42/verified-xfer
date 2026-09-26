@@ -31,3 +31,7 @@ public/
 .beads/*.lock
 .beads/daemon.*
 .beads/proxieddb/
+
+# Secrets (never commit private keys)
+*-key.pem
+*.key
