@@ -1,65 +1,65 @@
-# Agent notes
+# verified-xfer
 
-This repo follows **OpenSpec (behaviour-driven) → Beads → Ponytail code**, with **IxDF operator feedback** for non-technical lab users.
+Verified stage + retrieve of test files between a local folder and a Linux share (local mount or SFTP), with a checksum on every file.
+Stack: Python CLI (`src/verified_xfer`), optional FastAPI web (`verified-xfer web`), static Vercel replay in `demo/`. Not Svelte — operator tool, exception is intentional.
+Posture: ponytail (repo created 2026-08-08, older than 30 days). Shared health pack is `.cursor/skills/` and `.cursor/rules/` — follow those for `[Health]` work.
 
-1. Read `openspec/specs/file-staging/spec.md` (Gherkin is the acceptance contract).
-2. Read `BEADS.md` or run `bd ready` (epic `vx-0t0`).
-3. Obey `.cursor/rules/ponytail.mdc` — smallest working change.
-4. Obey `.cursor/rules/ixdf-operator-feedback.mdc` — status lines stay loud and plain; every FAIL has a `→` next step. See `DESIGN.md`.
-5. Do not silence `INITIALIZATION` / `CONFIG` / `TRANSFER` / `VERIFY` / `SUCCESS` / `SUMMARY` / `NEXT`.
-6. Config always names four folders: local `source_dir` → linux `staging_dir` (upload); linux `results_dir` (logs, separate) → local `retrieve_to`.
-7. Default UX is interactive: `verified-xfer` (no args) or `verified-xfer web` — select action → run → scrolling log. Keep one-shot `stage`/`retrieve` for scripts.
+## Commands
 
-When adding behaviour: update Gherkin first, then Beads, then code.
+- Install: `pip install -e ".[dev,web]"` (add `,[sftp]` only if touching the SFTP backend)
+- Interactive: `verified-xfer` (menu) or `verified-xfer web` (http://127.0.0.1:8765)
+- One-shot: `verified-xfer stage` / `verified-xfer retrieve` / `verified-xfer stage --dry-run`
+- Local four-folder practice: `examples/local-demo.sh` (Windows: `examples/local-demo.bat` or `.ps1`)
+- Test one file: `pytest tests/test_local_stage_retrieve.py -q`
+- Test all: `pytest tests/ -q`
+- Secrets: `bash scripts/scan-secrets.sh .`
+- Demo evidence: `DEMO.md`, `docs/demo/*.png`, `docs/sample-logs/`. Public URL `https://verified-xfer.vercel.app` is currently 404 (see issue #8).
 
-<!-- BEGIN BEADS INTEGRATION v:1 profile:minimal hash:7510c1e2 -->
-## Beads Issue Tracker
+No lint or typecheck command is configured. Do not invent one.
 
-This project uses **bd (beads)** for issue tracking. Run `bd prime` to see full workflow context and commands.
+## Hard prohibitions
 
-### Quick Reference
+- Do not commit private keys, `*-key.pem`, `*.key`, `.env` secrets, or `BEGIN … PRIVATE KEY`. Generate locally; gitignore them. Public certs may stay.
+- Do not set `staging_dir` equal to `results_dir`. Upload landing and log folder stay distinct.
+- Do not silence `INITIALIZATION` / `CONFIG` / `TRANSFER` / `VERIFY` / `SUCCESS` / `FAIL` / `SUMMARY` / `NEXT`. On FAIL, print a `NEXT` line with a `→` recovery step (`DESIGN.md`).
+- Do not add a watch-for-complete service, GUI shell, or extra framework. Capture it as a bead instead.
+- Do not invent SFTP hosts, routes, or env vars that are not in `config.example.yaml` or the CLI.
+- Do not rewrite OpenSpec / Gherkin to match a hoped-for future. Update them only when code already changed.
 
-```bash
-bd ready              # Find available work
-bd show <id>          # View issue details
-bd update <id> --claim  # Claim work
-bd close <id>         # Complete work
-```
+## Verify by change type
 
-### Rules
+| Change | Check |
+| --- | --- |
+| CLI stage/retrieve | `pytest tests/test_local_stage_retrieve.py -q` and a sample log still matches `docs/sample-logs/` |
+| Interactive menu | `pytest tests/test_cli_interactive.py -q` |
+| SFTP backend | `pytest tests/test_sftp_backend.py -q` (mocked; do not require a lab host) |
+| Web UI | `verified-xfer web` and `docs/demo/web-ui-stage.png` still describes the screen |
+| Spec | `openspec/specs/file-staging/spec.md` still matches the code you changed |
+| Deploy | `https://verified-xfer.vercel.app` and `/api/health` return 200 (currently open: #8) |
+| Secrets | `bash scripts/scan-secrets.sh .` passes |
 
-- Use `bd` for ALL task tracking — do NOT use TodoWrite, TaskCreate, or markdown TODO lists
-- Run `bd prime` for detailed command reference and session close protocol
-- Use `bd remember` for persistent knowledge — do NOT use MEMORY.md files
+## Source of truth
 
-**Architecture in one line:** issues live in a local Dolt DB; sync uses `refs/dolt/data` on your git remote; `.beads/issues.jsonl` is a passive export. See https://github.com/gastownhall/beads/blob/main/docs/SYNC_CONCEPTS.md for details and anti-patterns.
+- Behavior: `openspec/specs/file-staging/spec.md` (Gherkin is the contract)
+- Remaining work: Beads (`bd ready`, epic `vx-0t0`) and GitHub issues; see `BEADS.md`
+- Operator voice: `DESIGN.md` and `.cursor/rules/ixdf-operator-feedback.mdc`
+- Demo evidence: `DEMO.md`
 
-## Session Completion
+## House vocabulary
 
-**When ending a work session**, you MUST complete ALL steps below. Work is NOT complete until `git push` succeeds.
+- stage — copy `source_dir` → `staging_dir` and recheck size + checksum. Do not say upload-job or sync.
+- retrieve — copy `results_dir` → `retrieve_to` and recheck. Do not say download-job.
+- The four folders are `source_dir`, `staging_dir`, `results_dir`, `retrieve_to`. Do not collapse them.
+- Status lines are `INITIALIZATION`, `TRANSFER`, `VERIFY`, `SUCCESS` / `FAIL`, `SUMMARY`, `NEXT`. Do not replace them with a progress bar or log-level names.
 
-**MANDATORY WORKFLOW:**
+## Good / bad
 
-1. **File issues for remaining work** - Create issues for anything that needs follow-up
-2. **Run quality gates** (if code changed) - Tests, linters, builds
-3. **Update issue status** - Close finished work, update in-progress items
-4. **PUSH TO REMOTE** - This is MANDATORY:
-   ```bash
-   git pull --rebase
-   git push
-   git status  # MUST show "up to date with origin"
-   ```
-5. **Clean up** - Clear stashes, prune remote branches
-6. **Verify** - All changes committed AND pushed
-7. **Hand off** - Provide context for next session
+Bad: a checksum mismatch that only raises and exits.
+Good: `FAIL` plus `NEXT | →` telling the operator what to fix (see `DESIGN.md`).
 
-**CRITICAL RULES:**
-- Work is NOT complete until `git push` succeeds
-- NEVER stop before pushing - that leaves work stranded locally
-- NEVER say "ready to push when you are" - YOU must push
-- If push fails, resolve and retry until it succeeds
-<!-- END BEADS INTEGRATION -->
+## Borrowed patterns
 
-## Secrets
-
-Do not commit private keys, *-key.pem, *.key, .env secrets, or BEGIN … PRIVATE KEY. Generate locally; gitignore keys.
+- hard-prohibition — apache/airflow via ossrules.md (never-hedge rules for keys, folder split, status lines)
+- verification-matrix — apache/airflow via ossrules.md (CLI vs SFTP vs web vs spec)
+- single-source — browser-use/browser-use via ossrules.md (Gherkin and Beads stay authoritative)
+- house-vocabulary — apache/airflow via ossrules.md (stage/retrieve and the four folder keys)
